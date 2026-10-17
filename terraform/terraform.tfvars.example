@@ -1,0 +1,19 @@
+# Google Cloud Configuration
+project_id = "tu-proyecto-gcp"
+region     = "us-central1"
+app_name   = "armor-agent"
+
+# Image URL deployed to Cloud Run (Artifact Registry or GCR)
+container_image = "us-central1-docker.pkg.dev/tu-proyecto-gcp/armor-agent-repo/armor-agent:latest"
+
+# Cloud Armor Configuration
+allowed_ips             = ["0.0.0.0/0"]
+allowed_regions         = []          # Ej: ["MX", "US"]
+rate_limit_count        = 120         # Máximo de solicitudes por IP
+rate_limit_interval_sec = 60          # Ventana de tiempo en segundos
+
+# Gemini API Key (Opcional si usas Vertex AI ADC)
+gemini_api_key = ""
+
+# Model Armor Template
+model_armor_template_id = "armor-agent-template"

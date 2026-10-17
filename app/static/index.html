@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-900 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🛡️ Google Model Armor & Cloud Armor Demo</title>
+  <link rel="stylesheet" href="/static/styles.css?v=3">
+</head>
+<body class="h-full flex flex-col font-sans antialiased overflow-hidden">
+
+  <!-- Top Navigation Header -->
+  <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700/60 px-6 py-3 flex items-center justify-between shrink-0 shadow-lg">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-emerald-500 flex items-center justify-center text-white shadow-md">
+        <i class="fa-solid fa-shield-halved text-xl"></i>
+      </div>
+      <div>
+        <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+          Armor Agent <span class="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 font-medium border border-blue-500/30">Model Armor Demo</span>
+        </h1>
+        <p class="text-xs text-slate-400">Google Cloud Armor (WAF/Edge) + Model Armor (AI Safety) + Gemini</p>
+      </div>
+    </div>
+
+    <!-- Right status chips -->
+    <div class="flex items-center space-x-4 text-xs">
+      <div class="hidden sm:flex items-center px-3 py-1.5 rounded-lg bg-slate-700/50 border border-slate-600 text-slate-300">
+        <i class="fa-solid fa-server mr-2 text-emerald-400"></i>
+        <span>Cloud Run: <strong class="text-emerald-400 font-mono">Active</strong></span>
+      </div>
+      <div class="hidden sm:flex items-center px-3 py-1.5 rounded-lg bg-slate-700/50 border border-slate-600 text-slate-300">
+        <i class="fa-solid fa-network-wired mr-2 text-blue-400"></i>
+        <span>Cloud Armor: <strong class="text-blue-400 font-mono">Protected</strong></span>
+      </div>
+      <button id="clearChatBtn" class="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 transition flex items-center gap-1.5 border border-slate-600">
+        <i class="fa-solid fa-trash-can text-slate-400"></i>
+        <span>Limpiar Chat</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Layout (Split Screen) -->
+  <main class="flex-1 flex flex-col md:flex-row overflow-hidden">
+    
+    <!-- Left Column: Interactive Chat Area -->
+    <section class="flex-1 flex flex-col bg-slate-900 border-r border-slate-800 overflow-hidden relative">
+      
+      <!-- Chat Messages Container -->
+      <div id="chatMessages" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
+        <!-- Initial Welcome Message -->
+        <div class="flex items-start space-x-3 max-w-3xl">
+          <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shrink-0 shadow">
+            <i class="fa-solid fa-robot text-sm"></i>
+          </div>
+          <div class="bg-slate-800 border border-slate-700/80 rounded-2xl rounded-tl-sm px-4 py-3 shadow-md max-w-2xl">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-semibold text-blue-400">Asistente Protegido</span>
+              <span class="text-[10px] text-slate-400">Sistema Seguro</span>
+            </div>
+            <p class="text-sm text-slate-200 leading-relaxed">
+              ¡Hola! Soy tu asistente de IA conectado a <strong>Gemini</strong> y protegido por <strong>Google Cloud Model Armor</strong>. 
+              Puedes hacerme consultas regulares o probar intentos de Jailbreak, inyección de prompts y fuga de datos sensibles en el panel derecho para ver cómo actúa el sistema de seguridad en tiempo real.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Attack Preset Bar (Above input) -->
+      <div class="px-4 py-2 bg-slate-800/60 border-t border-slate-800 flex items-center gap-2 overflow-x-auto text-xs shrink-0">
+        <span class="text-slate-400 font-medium shrink-0 flex items-center gap-1">
+          <i class="fa-solid fa-bolt text-amber-400"></i> Pruebas Rápidas:
+        </span>
+        <button onclick="applyPreset(0)" class="px-2.5 py-1 rounded bg-slate-700/80 hover:bg-red-900/40 text-red-300 border border-red-800/40 whitespace-nowrap transition">
+          🚫 Jailbreak
+        </button>
+        <button onclick="applyPreset(1)" class="px-2.5 py-1 rounded bg-slate-700/80 hover:bg-amber-900/40 text-amber-300 border border-amber-800/40 whitespace-nowrap transition">
+          🔒 Fuga PII (Tarjeta)
+        </button>
+        <button onclick="applyPreset(2)" class="px-2.5 py-1 rounded bg-slate-700/80 hover:bg-purple-900/40 text-purple-300 border border-purple-800/40 whitespace-nowrap transition">
+          ⚠️ Contenido Tóxico
+        </button>
+        <button onclick="applyPreset(3)" class="px-2.5 py-1 rounded bg-slate-700/80 hover:bg-emerald-900/40 text-emerald-300 border border-emerald-800/40 whitespace-nowrap transition">
+          ✅ Consulta Legítima
+        </button>
+      </div>
+
+      <!-- Input Bar Form -->
+      <form id="chatForm" class="p-4 bg-slate-800/90 border-t border-slate-700/60 flex items-end gap-3 shrink-0">
+        <div class="flex-1 relative">
+          <textarea 
+            id="promptInput" 
+            rows="2" 
+            placeholder="Escribe tu mensaje o introduce un prompt de ataque para evaluar con Model Armor..." 
+            class="w-full bg-slate-900 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-sm border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none leading-relaxed"
+          ></textarea>
+        </div>
+        <button 
+          type="submit" 
+          id="sendBtn" 
+          class="h-11 px-5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span>Enviar</span>
+          <i class="fa-solid fa-paper-plane text-xs"></i>
+        </button>
+      </form>
+    </section>
+
+    <!-- Right Column: Model Armor Controls & Realtime Telemetry -->
+    <aside class="w-full md:w-96 lg:w-[440px] bg-slate-850 flex flex-col border-t md:border-t-0 md:border-l border-slate-800 overflow-y-auto p-5 space-y-5 shrink-0">
+      
+      <!-- Control 1: Model Armor Master Toggle -->
+      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+              <i class="fa-solid fa-shield-virus text-emerald-400"></i> Modo Model Armor
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Inspección de seguridad activa</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="masterArmorToggle" class="sr-only peer" checked>
+            <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+          </label>
+        </div>
+        <div id="armorStatusBadge" class="mt-3 flex items-center gap-2 text-xs font-medium text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>PROTEGIDO: Prompts y Respuestas sanitizadas</span>
+        </div>
+      </div>
+
+      <!-- Control 2: Model Selector -->
+      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 shadow-sm space-y-2">
+        <label for="modelSelect" class="block text-xs font-semibold text-slate-300 flex items-center gap-2">
+          <i class="fa-solid fa-brain text-blue-400"></i> Modelo en Vertex AI (Agnóstico con Model Armor)
+        </label>
+        <select id="modelSelect" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono">
+          <optgroup label="🔹 Google Gemini 2.5 (GA)">
+            <option value="gemini-2.5-flash" selected>gemini-2.5-flash (Recomendado - Baja Latencia)</option>
+            <option value="gemini-2.5-pro">gemini-2.5-pro (Razonamiento Complejo)</option>
+            <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (Ultra Rápido / Económico)</option>
+          </optgroup>
+          <optgroup label="🚀 Google Gemini 3 (Nueva Generación)">
+            <option value="gemini-3-flash-preview">gemini-3-flash-preview (Gemini 3.0 Flash)</option>
+            <option value="gemini-3-pro-preview">gemini-3-pro-preview (Gemini 3.0 Pro)</option>
+            <option value="gemini-3.1-pro-preview">gemini-3.1-pro-preview (Gemini 3.1 Pro)</option>
+            <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite (Gemini 3.1 Flash-Lite)</option>
+          </optgroup>
+          <optgroup label="🌐 Terceros / Open Models (Vertex Model Garden)">
+            <option value="openai/gpt-oss-120b-maas">openai/gpt-oss-120b-maas (OpenAI GPT-OSS 120B)</option>
+            <option value="meta/llama-3.3-70b-instruct-maas">meta/llama-3.3-70b-instruct-maas (Meta Llama 3.3 70B)</option>
+            <option value="google/gemma-4-26b-a4b-it-maas">google/gemma-4-26b-a4b-it-maas (Gemma 4 26B Open)</option>
+            <option value="deepseek-ai/deepseek-v4.1-flash-maas">deepseek-ai/deepseek-v4.1-flash-maas (DeepSeek V4.1 Flash)</option>
+            <option value="deepseek-ai/deepseek-r1-0528-maas">deepseek-ai/deepseek-r1-0528-maas (DeepSeek R1)</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <!-- Control 3: Informative GCP Template & Security Rules Status -->
+      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 shadow-sm space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-layer-group text-indigo-400"></i> Template en GCP (Solo Lectura)
+          </h3>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 font-semibold">
+            armor-agent-template
+          </span>
+        </div>
+        
+        <div class="space-y-2 text-xs">
+          <!-- Jailbreak Filter Status -->
+          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-900/50 border border-slate-700/40">
+            <span class="text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-user-ninja text-red-400"></i> PI & Jailbreak Filter
+            </span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold flex items-center gap-1 border border-emerald-500/20">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Activo (GCP)
+            </span>
+          </div>
+
+          <!-- PII / SDP Filter Status -->
+          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-900/50 border border-slate-700/40">
+            <span class="text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-id-card text-amber-400"></i> Sensitive Data (SDP / PII)
+            </span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold flex items-center gap-1 border border-emerald-500/20">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Activo (GCP)
+            </span>
+          </div>
+
+          <!-- Toxicity / RAI Status -->
+          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-900/50 border border-slate-700/40">
+            <span class="text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-biohazard text-purple-400"></i> Responsible AI (RAI)
+            </span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold flex items-center gap-1 border border-emerald-500/20">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Activo (GCP)
+            </span>
+          </div>
+
+          <!-- Malicious URLs Status -->
+          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-900/50 border border-slate-700/40">
+            <span class="text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-link-slash text-cyan-400"></i> Malicious URIs
+            </span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold flex items-center gap-1 border border-emerald-500/20">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Activo (GCP)
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Realtime Inspection Card -->
+      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 shadow-sm space-y-3">
+        <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center justify-between">
+          <span class="flex items-center gap-2">
+            <i class="fa-solid fa-magnifying-glass-chart text-emerald-400"></i> Auditoría de Seguridad (Último Turno)
+          </span>
+          <span id="telemetryStatus" class="text-[10px] px-2 py-0.5 rounded bg-slate-700 text-slate-300">En espera</span>
+        </h3>
+
+        <div id="telemetryContent" class="space-y-2 text-xs font-mono">
+          <div class="flex justify-between py-1 border-b border-slate-700/60">
+            <span class="text-slate-400 font-sans">Acción Prompt:</span>
+            <span id="statPromptAction" class="text-slate-300 font-bold">-</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-slate-700/60">
+            <span class="text-slate-400 font-sans">Latencia Armor:</span>
+            <span id="statArmorLatency" class="text-slate-300">-</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-slate-700/60">
+            <span class="text-slate-400 font-sans">Latencia LLM:</span>
+            <span id="statLlmLatency" class="text-slate-300">-</span>
+          </div>
+          <div class="py-1">
+            <span class="text-slate-400 font-sans block mb-1">Filtros Activados / Matches:</span>
+            <div id="statMatchDetails" class="bg-slate-900 p-2 rounded-lg text-[11px] text-slate-400 max-h-28 overflow-y-auto leading-snug">
+              Ninguna violación detectada.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- Frontend Logic -->
+  <script src="/static/app.js?v=3"></script>
+</body>
+</html>
