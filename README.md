@@ -196,37 +196,6 @@ En la interfaz web tienes botones de **1-Click Attack Presets**, o puedes probar
 
 ---
 
-## ⚠️ Guía de Troubleshooting y Lecciones Aprendidas (Importante)
-
-Esta sección documenta los detalles técnicos críticos descubiertos durante la implementación en GCP para evitar errores o confusiones al desplegar desde cero:
-
-### 1. Errores al crear Políticas / Templates de Model Armor (`400 Bad Request` o `404 Not Found`)
-- **Causa 1 (Endpoint Regional Obligatorio):** La API de Model Armor v1 requiere obligatoriamente el **endpoint regional con `.rep.googleapis.com`**:
-  - ✅ Correcto: `https://modelarmor.us-central1.rep.googleapis.com/v1/projects/{PROJECT_ID}/locations/us-central1/templates`
-  - ❌ Incorrecto: `https://modelarmor.googleapis.com/v1/...` (falla o rechaza peticiones regionales).
-- **Causa 2 (Esquema JSON estricto de `filterConfig`):** En la versión `v1` de la API de Model Armor:
-  - El parámetro del query string al hacer `POST` debe ser `?templateId=armor-agent-template`.
-  - `sdpSettings` requiere anidarse bajo `basicConfig`: `{"sdpSettings": {"basicConfig": {"filterEnforcement": "ENABLED"}}}`.
-  - `raiSettings` requiere un arreglo `raiFilters` con objetos `{"filterType": "DANGEROUS | HATE_SPEECH | HARASSMENT | SEXUALLY_EXPLICIT", "confidenceLevel": "MEDIUM_AND_ABOVE"}`.
-- **Causa 3 (Estructura de respuesta en `sanitizeUserPrompt`):** La API v1 devuelve un mapa `sanitizationResult.filterResults` cuyas llaves son `pi_and_jailbreak`, `sdp`, `rai` y `malicious_uris`. El parser en `app/core/model_armor.py` inspecciona directamente estos objetos anidados para extraer tanto la regla como los `findings` (`infoType` y `likelihood`) de Cloud DLP.
-
-### 2. ¿Por qué Gemini parece responder con el mensaje de bloqueo de Model Armor aun cuando activo "BYPASS"?
-- **Explicación del fenómeno (No es un error del servicio):**
-  - Si primero realizas una prueba con **Model Armor ACTIVADO**, el mensaje de bloqueo (`🛡️ Acceso Interceptado por Google Cloud Model Armor (armor-agent-template)...`) se muestra en el chat y se agrega al historial de la conversación (`state.history`) como una respuesta previa del asistente (`role: "model"`).
-  - Si inmediatamente después apagas el switch a **BYPASS (Model Armor Desactivado)** **sin limpiar el chat** y lanzas otro ataque (ej. *Prompt Injection*), la petición sí se salta Model Armor (verás que la burbuja sale en **verde** como **`🛡️ Respuesta Aprobada`**), pero los modelos avanzados de **Gemini 2.5 y Gemini 3** leen el historial de los turnos previos y, por **In-Context Learning (imitación de contexto)**, redactan ellos mismos una respuesta idéntica al formato de bloqueo que vieron en su propio historial.
-- **✅ Solución durante la Demo:**
-  - Siempre haz clic en el botón **🗑️ Limpiar Chat** (arriba a la derecha del chat) cuando cambies el switch entre **Modo Protegido** y **Modo Bypass**. Con el historial limpio y el `system_instruction` genérico configurado en `app/core/agent.py`, el modelo responderá de forma pura sin imitar a Model Armor.
-
-### 3. Pantalla en blanco o interfaz desconfigurada al entrar por la IP del Load Balancer
-- **Causa:** En redes corporativas o con políticas estrictas de salida, el navegador puede quedarse esperando indefinidamente (*timeout*) al intentar descargar librerías CSS/JS desde CDNs externos como `cdn.tailwindcss.com`, `cdn.jsdelivr.net` o `cdnjs.cloudflare.com`.
-- **Solución implementada:** Se eliminaron todas las dependencias a CDNs de terceros (excepto íconos opcionales no bloqueantes) y se integró todo el diseño en `app/static/styles.css` junto con un parser Markdown propio en `app/static/app.js`. Además, `app/main.py` envía cabeceras `Cache-Control: no-cache, no-store, must-revalidate` en `/` para garantizar que el navegador siempre cargue la última versión.
-
-### 4. Error `404 NOT_FOUND` con modelos antiguos (`gemini-1.5-*` o `gemini-2.0-flash`) y Enrutamiento `global`
-- **Modelos retirados:** En proyectos recientes de GCP Vertex AI, los modelos `gemini-1.5-flash`, `gemini-1.5-pro` y `gemini-2.0-flash` han sido retirados y devuelven `404 NOT_FOUND`. Esta demo utiliza únicamente **Gemini 2.5 GA** (`gemini-2.5-flash`, `gemini-2.5-pro`, `gemini-2.5-flash-lite`) y superiores.
-- **Modelos en Endpoint `global` vs `us-central1`:** Los modelos **Gemini 3 Preview** (`gemini-3-flash-preview`, `gemini-3-pro-preview`, `gemini-3.1-pro-preview`, `gemini-3.1-flash-lite`) y ciertos modelos Serverless MaaS (`google/gemma-4-26b-a4b-it-maas`, `deepseek-ai/deepseek-v4.1-flash-maas`) sólo están disponibles a través del endpoint **`location="global"`** de Vertex AI. `app/core/agent.py` detecta automáticamente el modelo y enruta la llamada entre `global` y `us-central1`, incluyendo soporte automático para el endpoint OpenAI-compatible de Vertex AI (`/endpoints/openapi/chat/completions`) en modelos de terceros como Llama 3.3.
-
----
-
 ## 💻 Ejecución Local (Con Credenciales ADC de GCP)
 
 ```bash
