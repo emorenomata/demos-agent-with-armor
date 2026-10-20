@@ -1,19 +1,29 @@
-# Google Cloud Configuration
-project_id = "tu-proyecto-gcp"
+# ==============================================================================
+# Armor Agent - Terraform Variables Example
+# Copy this file to `terraform.tfvars` and customize with your project values:
+#   cp terraform.tfvars.example terraform.tfvars
+# ==============================================================================
+
+# 1. Target Google Cloud Project & Region
+project_id = "your-gcp-project-id"
 region     = "us-central1"
 app_name   = "armor-agent"
 
-# Image URL deployed to Cloud Run (Artifact Registry or GCR)
-container_image = "us-central1-docker.pkg.dev/tu-proyecto-gcp/armor-agent-repo/armor-agent:latest"
+# 2. Container Image in Artifact Registry
+# Build with:
+#   gcloud builds submit --tag us-central1-docker.pkg.dev/YOUR_PROJECT_ID/armor-agent-repo/armor-agent:latest ..
+container_image = "us-central1-docker.pkg.dev/your-gcp-project-id/armor-agent-repo/armor-agent:latest"
 
-# Cloud Armor Configuration
-allowed_ips             = ["0.0.0.0/0"]
-allowed_regions         = []          # Ej: ["MX", "US"]
-rate_limit_count        = 120         # Máximo de solicitudes por IP
-rate_limit_interval_sec = 60          # Ventana de tiempo en segundos
+# 3. Vertex AI Agent Engine (Reasoning Engine) Resource Name
+# Deploy with:
+#   python ../scripts/deploy_agent_engine.py --project-id YOUR_PROJECT_ID --location us-central1
+agent_engine_resource_name = "projects/YOUR_PROJECT_NUMBER/locations/us-central1/reasoningEngines/YOUR_ENGINE_ID"
 
-# Gemini API Key (Opcional si usas Vertex AI ADC)
-gemini_api_key = ""
-
-# Model Armor Template
+# 4. Model Armor Template ID
 model_armor_template_id = "armor-agent-template"
+
+# 5. Cloud Armor Edge Security Policy Settings
+allowed_ips             = ["0.0.0.0/0"]
+allowed_regions         = [] # e.g. ["MX", "US"] to restrict by ISO country code
+rate_limit_count        = 120
+rate_limit_interval_sec = 60

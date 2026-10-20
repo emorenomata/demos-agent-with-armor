@@ -1,249 +1,830 @@
 <!DOCTYPE html>
-<html lang="es" class="h-full bg-slate-900 text-slate-100">
+<html lang="es" data-theme="dark" class="h-full">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🛡️ Google Model Armor & Cloud Armor Demo</title>
-  <link rel="stylesheet" href="/static/styles.css?v=3">
+  <title>🛡️ Armor Agent — Plataforma Vertex AI + Model Armor (Material Design 3)</title>
+  <!-- Cache-Busting Versioning v=20261019-v4 -->
+  <link rel="stylesheet" href="/static/styles.css?v=20261019-v4">
 </head>
-<body class="h-full flex flex-col font-sans antialiased overflow-hidden">
+<body class="h-full flex flex-col font-sans overflow-hidden bg-[var(--md-sys-color-background)] text-[var(--md-sys-color-on-background)]">
 
-  <!-- Top Navigation Header -->
-  <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700/60 px-6 py-3 flex items-center justify-between shrink-0 shadow-lg">
+  <!-- =========================================================================
+       1. Top Command Bar (MD3 Top App Bar + Central Command Controls)
+       ========================================================================= -->
+  <header class="md3-top-app-bar px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shrink-0 border-b border-[var(--md-sys-color-outline-variant)]">
+    
+    <!-- Sección Izquierda: Identidad de Marca y Subtítulo en Español -->
     <div class="flex items-center space-x-3">
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-emerald-500 flex items-center justify-center text-white shadow-md">
+      <div class="md3-brand-avatar" title="Google Cloud Model Armor + Vertex AI Agent Platform">
         <i class="fa-solid fa-shield-halved text-xl"></i>
       </div>
       <div>
-        <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
-          Armor Agent <span class="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 font-medium border border-blue-500/30">Model Armor Demo</span>
+        <h1 class="text-base font-bold tracking-tight text-white flex items-center gap-2">
+          <span>Armor Agent</span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-700/80 text-slate-200 font-medium border border-slate-600">
+            Plataforma Vertex AI + Model Armor (Entrada y Salida)
+          </span>
         </h1>
-        <p class="text-xs text-slate-400">Google Cloud Armor (WAF/Edge) + Model Armor (AI Safety) + Gemini</p>
+        <div class="flex items-center gap-2 text-[11px] text-slate-400">
+          <span>Proyecto: <strong class="text-slate-200 font-mono">armor-agent-demo-mau</strong></span>
+          <span class="text-slate-600">•</span>
+          <span>Región: <strong class="text-slate-300 font-mono">us-central1</strong></span>
+          <span class="text-slate-600">•</span>
+          <span class="text-emerald-400 font-semibold flex items-center gap-1">
+            <i class="fa-solid fa-server text-[9px]"></i> Cloud Run + LB
+          </span>
+        </div>
       </div>
     </div>
 
-    <!-- Right status chips -->
-    <div class="flex items-center space-x-4 text-xs">
-      <div class="hidden sm:flex items-center px-3 py-1.5 rounded-lg bg-slate-700/50 border border-slate-600 text-slate-300">
-        <i class="fa-solid fa-server mr-2 text-emerald-400"></i>
-        <span>Cloud Run: <strong class="text-emerald-400 font-mono">Active</strong></span>
+    <!-- Sección Central: Selector de Modelo, Presets de Seguridad & Interruptor Floor Setting -->
+    <div class="flex items-center flex-wrap gap-2.5 text-xs">
+      
+      <!-- Selector Exclusivo de Modelos: estrictamente limitado a gemini-4-argon y gemini-3.8-flash -->
+      <div class="flex items-center gap-1.5 bg-slate-900/80 px-2.5 py-1 rounded-xl border border-slate-700/70" title="Modelo en ejecución en Vertex AI Agent Engine">
+        <label for="modelSelect" class="text-slate-300 font-medium flex items-center gap-1 text-[11px] shrink-0">
+          <i class="fa-solid fa-brain text-blue-300"></i> Modelo:
+        </label>
+        <select id="modelSelect" class="md3-select-compact font-mono text-xs bg-slate-800 text-white rounded-lg border-0 focus:ring-1 focus:ring-blue-400 py-1 pl-2 pr-6">
+          <option value="gemini-4-argon" selected>gemini-4-argon (Vertex AI Agent Engine)</option>
+          <option value="gemini-3.8-flash">gemini-3.8-flash (Vertex AI Agent Engine)</option>
+        </select>
       </div>
-      <div class="hidden sm:flex items-center px-3 py-1.5 rounded-lg bg-slate-700/50 border border-slate-600 text-slate-300">
-        <i class="fa-solid fa-network-wired mr-2 text-blue-400"></i>
-        <span>Cloud Armor: <strong class="text-blue-400 font-mono">Protected</strong></span>
+
+      <!-- Menú Desplegable de Presets de Prueba de Seguridad (Entrada, Salida y Consulta Segura) -->
+      <div class="flex items-center gap-1.5 bg-slate-900/80 px-2.5 py-1 rounded-xl border border-slate-700/70" title="Selecciona una prueba de entrada (SANITIZE_USER_PROMPT), de respuesta (SANITIZE_MODEL_RESPONSE) o consulta segura">
+        <label for="presetSelect" class="text-slate-300 font-medium flex items-center gap-1 text-[11px] shrink-0">
+          <i class="fa-solid fa-bolt text-amber-400"></i> Pruebas:
+        </label>
+        <select id="presetSelect" class="md3-select-compact text-xs bg-slate-800 text-slate-100 rounded-lg border-0 focus:ring-1 focus:ring-amber-400 py-1 pl-2 pr-6" onchange="if(this.value!=='') { applyPreset(Number(this.value)); this.value=''; }">
+          <option value="" selected disabled>Cargar prueba de seguridad...</option>
+          <optgroup label="🚫 Ataques en Prompt de Entrada (SANITIZE_USER_PROMPT)">
+            <option value="0">🚫 Entrada: Inyección de Prompt / Jailbreak</option>
+            <option value="1">💳 Entrada: Fuga de Tarjeta (SDP)</option>
+            <option value="2">🔑 Entrada: Secreto / Contraseña (SDP)</option>
+            <option value="3">⚠️ Entrada: Solicitud Peligrosa (RAI)</option>
+            <option value="4">🔗 Entrada: Enlace Malicioso / Phishing (Web Risk)</option>
+          </optgroup>
+          <optgroup label="📤 Fugas en Respuesta del Modelo (SANITIZE_MODEL_RESPONSE)">
+            <option value="5">📤 Respuesta: Tarjeta de Juan Pérez (CRM → Salida SDP)</option>
+            <option value="6">📤 Respuesta: SSN de María López (RRHH → Salida SDP)</option>
+            <option value="7">📤 Respuesta: Enlace Malicioso del Proveedor (Catálogo → Salida Web Risk)</option>
+          </optgroup>
+          <optgroup label="✅ Consulta Segura">
+            <option value="8">✅ Consulta Legítima (Entrada y Salida Seguras)</option>
+          </optgroup>
+        </select>
       </div>
-      <button id="clearChatBtn" class="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 transition flex items-center gap-1.5 border border-slate-600">
-        <i class="fa-solid fa-trash-can text-slate-400"></i>
-        <span>Limpiar Chat</span>
+
+      <!-- Interruptor Maestro del Floor Setting (INSPECT_AND_BLOCK vs INSPECT_ONLY) -->
+      <div class="flex items-center gap-2 bg-slate-900/80 px-2.5 py-1 rounded-xl border border-slate-700/70">
+        <div class="flex items-center gap-1.5">
+          <i class="fa-solid fa-shield-virus text-emerald-400 text-xs"></i>
+          <span class="text-[11px] text-slate-300 font-medium">Floor Setting:</span>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer" title="Alternar entre Bloqueo Activo y Modo Auditoría">
+          <input type="checkbox" id="masterArmorToggle" class="sr-only" checked>
+          <div class="md3-switch-track w-8 h-4 bg-emerald-600 rounded-full transition-colors relative">
+            <div class="md3-switch-thumb absolute left-0.5 top-0.5 w-3 h-3 bg-white rounded-full transition-transform"></div>
+          </div>
+        </label>
+        <span id="armorStatusBadge" class="text-[10px] font-mono px-2 py-0.5 rounded-md font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+          INSPECT_AND_BLOCK
+        </span>
+      </div>
+
+    </div>
+
+    <!-- Sección Derecha: Paleta Oficial M3, Selector Tema Oscuro/Claro & Botón Limpiar -->
+    <div class="flex items-center gap-2 text-xs">
+      
+      <!-- Paleta Oficial de 6 Tonos Material Design 3 (#06141B → #CCD0CF) -->
+      <div class="hidden xl:flex items-center gap-1 md3-palette-pill" title="Paleta Oficial MD3: #06141B · #11212D · #253745 · #4A5C6A · #9BA8AB · #CCD0CF">
+        <span class="text-[9px] font-mono text-slate-300 px-1">MD3</span>
+        <span class="md3-swatch" style="background-color:#06141B" title="#06141B"></span>
+        <span class="md3-swatch" style="background-color:#11212D" title="#11212D"></span>
+        <span class="md3-swatch" style="background-color:#253745" title="#253745"></span>
+        <span class="md3-swatch" style="background-color:#4A5C6A" title="#4A5C6A"></span>
+        <span class="md3-swatch" style="background-color:#9BA8AB" title="#9BA8AB"></span>
+        <span class="md3-swatch" style="background-color:#CCD0CF" title="#CCD0CF"></span>
+      </div>
+
+      <!-- Selector Material Design 3: Tema Oscuro / Tema Claro -->
+      <div class="md3-theme-segmented" role="group" aria-label="Selector de tema">
+        <button id="themeDarkBtn" type="button" class="md3-theme-btn active" title="Activar Tema Oscuro (#06141B / #11212D)">
+          <i class="fa-solid fa-moon text-[10px]"></i>
+          <span>Oscuro</span>
+        </button>
+        <button id="themeLightBtn" type="button" class="md3-theme-btn" title="Activar Tema Claro (#CCD0CF / #9BA8AB)">
+          <i class="fa-solid fa-sun text-[10px]"></i>
+          <span>Claro</span>
+        </button>
+      </div>
+
+      <!-- Botón Limpiar / Reiniciar Conversación -->
+      <button id="clearChatBtn" type="button" class="md3-btn-tonal" title="Reiniciar sesión y telemetría de chat">
+        <i class="fa-solid fa-trash-can"></i>
+        <span>Limpiar</span>
       </button>
+
     </div>
   </header>
 
-  <!-- Main Content Layout (Split Screen) -->
-  <main class="flex-1 flex flex-col md:flex-row overflow-hidden">
+  <!-- =========================================================================
+       2. Barra de Navegación por Pestañas (Tabbed Navigation Container - 5 Tabs)
+       ========================================================================= -->
+  <nav class="md3-tabs-bar bg-[var(--md-sys-color-surface-container-low)] border-b border-[var(--md-sys-color-outline-variant)] px-4 flex items-center gap-1 shrink-0" role="tablist" aria-label="Secciones de la plataforma de seguridad">
     
-    <!-- Left Column: Interactive Chat Area -->
-    <section class="flex-1 flex flex-col bg-slate-900 border-r border-slate-800 overflow-hidden relative">
+    <!-- Tab 1: Chat Playground -->
+    <button id="tabBtnChat" type="button" class="md3-tab active" role="tab" aria-selected="true" aria-controls="tabPanelChat" data-tab="chat">
+      <i class="fa-solid fa-comments"></i>
+      <span>Chat Playground</span>
+    </button>
+
+    <!-- Tab 2: Arquitectura Gráfica del Sistema -->
+    <button id="tabBtnArch" type="button" class="md3-tab" role="tab" aria-selected="false" aria-controls="tabPanelArch" data-tab="arch">
+      <i class="fa-solid fa-diagram-project"></i>
+      <span>Arquitectura del Sistema</span>
+      <span class="text-[9px] px-1.5 py-0.2 rounded-full bg-blue-500/20 text-blue-300 font-mono border border-blue-500/30">Diagrama + IaC</span>
+    </button>
+
+    <!-- Tab 3: Auditoría del Turno -->
+    <button id="tabBtnAudit" type="button" class="md3-tab" role="tab" aria-selected="false" aria-controls="tabPanelAudit" data-tab="audit">
+      <i class="fa-solid fa-magnifying-glass-chart"></i>
+      <span>Auditoría del Turno</span>
+      <span id="tabBadgeAudit" class="text-[9px] px-1.5 py-0.2 rounded-full bg-slate-700 text-slate-300 font-mono">En espera</span>
+    </button>
+
+    <!-- Tab 4: Políticas y Detectores Activos -->
+    <button id="tabBtnPolicies" type="button" class="md3-tab" role="tab" aria-selected="false" aria-controls="tabPanelPolicies" data-tab="policies">
+      <i class="fa-solid fa-layer-group"></i>
+      <span>Políticas y Detectores Activos</span>
+      <span class="text-[9px] px-1.5 py-0.2 rounded-full bg-indigo-500/20 text-indigo-300 font-mono border border-indigo-500/30">Cero Código</span>
+    </button>
+
+    <!-- Tab 5: Cloud Logging en Vivo -->
+    <button id="tabBtnLogs" type="button" class="md3-tab" role="tab" aria-selected="false" aria-controls="tabPanelLogs" data-tab="logs">
+      <i class="fa-solid fa-file-waveform"></i>
+      <span>Cloud Logging en Vivo</span>
+      <span class="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 font-mono border border-emerald-500/30">SanitizeOperation</span>
+    </button>
+
+  </nav>
+
+  <!-- =========================================================================
+       3. Contenedor de Paneles por Pestañas (Workspace Container)
+       ========================================================================= -->
+  <main class="flex-1 flex flex-col overflow-hidden relative">
+
+    <!-- -----------------------------------------------------------------------
+         TAB 1: Chat Playground
+         ----------------------------------------------------------------------- -->
+    <section id="tabPanelChat" class="md3-tab-panel active flex-1 flex flex-col overflow-hidden bg-[var(--md-sys-color-surface)]" role="tabpanel" aria-labelledby="tabBtnChat">
       
-      <!-- Chat Messages Container -->
+      <!-- Contenedor de Mensajes del Chat -->
       <div id="chatMessages" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
-        <!-- Initial Welcome Message -->
-        <div class="flex items-start space-x-3 max-w-3xl">
-          <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shrink-0 shadow">
+        <!-- Burbuja Inicial de Bienvenida -->
+        <div class="flex items-start space-x-3 max-w-3xl chat-bubble-enter">
+          <div class="md3-avatar-bot">
             <i class="fa-solid fa-robot text-sm"></i>
           </div>
-          <div class="bg-slate-800 border border-slate-700/80 rounded-2xl rounded-tl-sm px-4 py-3 shadow-md max-w-2xl">
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-xs font-semibold text-blue-400">Asistente Protegido</span>
-              <span class="text-[10px] text-slate-400">Sistema Seguro</span>
+          <div class="md3-bubble-bot max-w-2xl prose">
+            <div class="flex items-center justify-between mb-1.5 pb-1 border-b border-slate-700/60">
+              <span class="text-xs font-bold text-white flex items-center gap-1.5">
+                <i class="fa-solid fa-shield-halved text-emerald-400 text-xs"></i>
+                Agente ADK en Vertex AI Agent Platform
+              </span>
+              <span class="text-[10px] text-emerald-400 font-mono font-semibold">Inspección Entrada + Salida</span>
             </div>
             <p class="text-sm text-slate-200 leading-relaxed">
-              ¡Hola! Soy tu asistente de IA conectado a <strong>Gemini</strong> y protegido por <strong>Google Cloud Model Armor</strong>. 
-              Puedes hacerme consultas regulares o probar intentos de Jailbreak, inyección de prompts y fuga de datos sensibles en el panel derecho para ver cómo actúa el sistema de seguridad en tiempo real.
+              ¡Hola! Soy un agente inteligente de <strong>Google ADK</strong> desplegado en <strong>Vertex AI Agent Engine</strong> ejecutando exclusivamente <code>gemini-4-argon</code> y <code>gemini-3.8-flash</code> sin una sola línea de código de seguridad en la aplicación.
             </p>
+            <p class="text-xs text-slate-300 leading-relaxed mt-2">
+              Toda llamada pasa de forma obligatoria en <strong>ambas direcciones</strong> por <strong>Model Armor Floor Settings</strong> y <strong>Sensitive Data Protection (SDP / DLP)</strong>:
+              tanto el <strong>Prompt de Entrada</strong> (<code>SANITIZE_USER_PROMPT</code>) como la <strong>Respuesta del Modelo</strong> (<code>SANITIZE_MODEL_RESPONSE</code>).
+              Usa el menú de <strong>Pruebas</strong>, los chips de acceso rápido o explora la pestaña <strong>Arquitectura del Sistema</strong>.
+            </p>
+            <div class="mt-2.5 pt-2 border-t border-slate-700/50 flex flex-wrap items-center gap-2">
+              <button type="button" data-tab="arch" class="btn-action-secondary text-[11px]">
+                <i class="fa-solid fa-diagram-project"></i>
+                <span>Ver Arquitectura Gráfica del Sistema</span>
+              </button>
+              <button type="button" data-tab="policies" class="btn-action-secondary text-[11px]">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>Ver Políticas y Detectores Activos</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Quick Attack Preset Bar (Above input) -->
-      <div class="px-4 py-2 bg-slate-800/60 border-t border-slate-800 flex items-center gap-2 overflow-x-auto text-xs shrink-0">
-        <span class="text-slate-400 font-medium shrink-0 flex items-center gap-1">
-          <i class="fa-solid fa-bolt text-amber-400"></i> Pruebas Rápidas:
+      <!-- Barra de Chips de Asistencia Rápida (Material 3 Assist Chips: Entrada + Salida) -->
+      <div class="px-4 py-2 bg-slate-800/80 border-t border-slate-800 flex items-center gap-2 overflow-x-auto text-xs shrink-0">
+        <span class="text-slate-300 font-semibold shrink-0 flex items-center gap-1 text-[11px]">
+          <i class="fa-solid fa-bolt text-amber-400"></i> Accesos Rápidos:
         </span>
-        <button onclick="applyPreset(0)" class="px-2.5 py-1 rounded bg-slate-700/80 hover:bg-red-900/40 text-red-300 border border-red-800/40 whitespace-nowrap transition">
-          🚫 Jailbreak
+        <button type="button" onclick="applyPreset(0)" class="md3-assist-chip" title="Bloqueo en Prompt de Entrada (SANITIZE_USER_PROMPT)">
+          🚫 Entrada: Jailbreak
         </button>
-        <button onclick="applyPreset(1)" class="px-2.5 py-1 rounded bg-slate-700/80 hover:bg-amber-900/40 text-amber-300 border border-amber-800/40 whitespace-nowrap transition">
-          🔒 Fuga PII (Tarjeta)
+        <button type="button" onclick="applyPreset(1)" class="md3-assist-chip" title="Bloqueo en Prompt de Entrada (SANITIZE_USER_PROMPT)">
+          💳 Entrada: Tarjeta (SDP)
         </button>
-        <button onclick="applyPreset(2)" class="px-2.5 py-1 rounded bg-slate-700/80 hover:bg-purple-900/40 text-purple-300 border border-purple-800/40 whitespace-nowrap transition">
-          ⚠️ Contenido Tóxico
+        <button type="button" onclick="applyPreset(3)" class="md3-assist-chip" title="Bloqueo en Prompt de Entrada (SANITIZE_USER_PROMPT)">
+          ⚠️ Entrada: RAI Peligroso
         </button>
-        <button onclick="applyPreset(3)" class="px-2.5 py-1 rounded bg-slate-700/80 hover:bg-emerald-900/40 text-emerald-300 border border-emerald-800/40 whitespace-nowrap transition">
+        <button type="button" onclick="applyPreset(5)" class="md3-assist-chip" title="Entrada Permitida → Bloqueo en Respuesta del Modelo (SANITIZE_MODEL_RESPONSE)">
+          📤 Respuesta: Tarjeta Juan Pérez (Salida SDP)
+        </button>
+        <button type="button" onclick="applyPreset(6)" class="md3-assist-chip" title="Entrada Permitida → Bloqueo en Respuesta del Modelo (SANITIZE_MODEL_RESPONSE)">
+          📤 Respuesta: SSN María López (Salida SDP)
+        </button>
+        <button type="button" onclick="applyPreset(7)" class="md3-assist-chip" title="Entrada Permitida → Bloqueo en Respuesta del Modelo (SANITIZE_MODEL_RESPONSE)">
+          📤 Respuesta: URL Maliciosa (Salida Web Risk)
+        </button>
+        <button type="button" onclick="applyPreset(8)" class="md3-assist-chip" title="Consulta Segura Permitida en Entrada y Salida">
           ✅ Consulta Legítima
         </button>
       </div>
 
-      <!-- Input Bar Form -->
-      <form id="chatForm" class="p-4 bg-slate-800/90 border-t border-slate-700/60 flex items-end gap-3 shrink-0">
+      <!-- Formulario de Entrada de Mensaje (Prompt Input & Enviar) -->
+      <form id="chatForm" class="p-3 md:p-4 bg-slate-800/90 border-t border-slate-700/60 flex items-end gap-3 shrink-0">
         <div class="flex-1 relative">
           <textarea 
             id="promptInput" 
             rows="2" 
-            placeholder="Escribe tu mensaje o introduce un prompt de ataque para evaluar con Model Armor..." 
-            class="w-full bg-slate-900 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-sm border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none leading-relaxed"
+            placeholder="Escribe tu mensaje en español o selecciona un preset de Entrada o de Respuesta del Modelo para evaluar con Model Armor + SDP..." 
+            class="md3-input-field resize-none w-full"
           ></textarea>
         </div>
         <button 
           type="submit" 
           id="sendBtn" 
-          class="h-11 px-5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="md3-btn-filled disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
         >
           <span>Enviar</span>
           <i class="fa-solid fa-paper-plane text-xs"></i>
         </button>
       </form>
+
     </section>
 
-    <!-- Right Column: Model Armor Controls & Realtime Telemetry -->
-    <aside class="w-full md:w-96 lg:w-[440px] bg-slate-850 flex flex-col border-t md:border-t-0 md:border-l border-slate-800 overflow-y-auto p-5 space-y-5 shrink-0">
+    <!-- -----------------------------------------------------------------------
+         TAB 2: Arquitectura Gráfica del Sistema (Interactive SVG + IaC Blueprint)
+         ----------------------------------------------------------------------- -->
+    <section id="tabPanelArch" class="md3-tab-panel hidden flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-[var(--md-sys-color-surface-container-low)]" role="tabpanel" aria-labelledby="tabBtnArch">
       
-      <!-- Control 1: Model Armor Master Toggle -->
-      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 shadow-sm">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="text-sm font-semibold text-white flex items-center gap-2">
-              <i class="fa-solid fa-shield-virus text-emerald-400"></i> Modo Model Armor
-            </h3>
-            <p class="text-xs text-slate-400 mt-0.5">Inspección de seguridad activa</p>
+      <div class="max-w-4xl mx-auto space-y-4" style="max-width: 72rem;">
+
+        <!-- Encabezado y Selector Interactivo de Flujos sobre el Diagrama -->
+        <div class="md3-card space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-700/60">
+            <div>
+              <h2 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-diagram-project text-emerald-400"></i> Arquitectura Gráfica de Defensa en Profundidad (Google Cloud + Vertex AI)
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Despliegue 100% automatizado con <strong>Terraform IaC</strong> en el proyecto <code>armor-agent-demo-mau</code> (<code>us-central1</code>) con inspección bidireccional Zero-Code
+              </p>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold">
+                3 Capas de Seguridad Activas
+              </span>
+              <span class="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-indigo-500/15 text-blue-300 border border-indigo-500/30 font-semibold">
+                Terraform Reproducible
+              </span>
+            </div>
           </div>
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" id="masterArmorToggle" class="sr-only peer" checked>
-            <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-          </label>
+
+          <!-- Botones de Simulación Visual de Flujos en el Diagrama -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="text-[11px] font-semibold text-slate-300 mr-1">Simular flujo en el diagrama:</span>
+              <button type="button" id="archFlowBtnAll" onclick="selectArchFlow('all')" class="arch-flow-btn active">
+                <span>🌐 Vista Completa (End-to-End)</span>
+              </button>
+              <button type="button" id="archFlowBtnInput" onclick="selectArchFlow('input_block')" class="arch-flow-btn">
+                <span>🚫 Flujo 1: Bloqueo en Entrada (USER_PROMPT)</span>
+              </button>
+              <button type="button" id="archFlowBtnOutput" onclick="selectArchFlow('output_block')" class="arch-flow-btn">
+                <span>📤 Flujo 2: Bloqueo en Salida (MODEL_RESPONSE)</span>
+              </button>
+              <button type="button" id="archFlowBtnAllowed" onclick="selectArchFlow('allowed')" class="arch-flow-btn">
+                <span>✅ Flujo 3: Consulta Segura / Auditoría</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Banner Explicativo Dinámico del Flujo Seleccionado -->
+          <div id="archFlowBanner" class="p-3 rounded-xl bg-slate-900/80 border border-slate-700/70 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div class="space-y-0.5 flex-1">
+              <div class="font-bold text-emerald-400 flex items-center gap-1.5">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Arquitectura Completa de 3 Capas: Perímetro L7 (Cloud Armor) + Cómputo Serverless (Cloud Run) + Guardarraíles Inline (Model Armor + SDP)</span>
+              </div>
+              <div class="text-slate-300 text-[11px]">
+                Haz clic en cualquier <strong>componente del diagrama gráfico</strong> para inspeccionar su configuración real en GCP y su archivo de Terraform, o selecciona uno de los flujos arriba para ver el recorrido exacto de los paquetes.
+              </div>
+            </div>
+            <button type="button" onclick="applyPreset(5)" class="btn-action-secondary shrink-0">
+              <i class="fa-solid fa-bolt text-amber-400"></i>
+              <span>Probar Bloqueo de Salida en Vivo →</span>
+            </button>
+          </div>
+
+          <!-- Lienzo Gráfico SVG Interactivo de la Arquitectura -->
+          <div class="arch-diagram-wrapper">
+            <svg id="archSvgDiagram" class="arch-svg" viewBox="0 0 1120 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama de Arquitectura del Sistema Armor Agent en Google Cloud">
+              <defs>
+                <!-- Marcadores de Flecha por Tipo de Tráfico -->
+                <marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#38BDF8"/>
+                </marker>
+                <marker id="arrowGreen" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#34D399"/>
+                </marker>
+                <marker id="arrowRed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#F87171"/>
+                </marker>
+                <marker id="arrowOrange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#FB923C"/>
+                </marker>
+                <marker id="arrowPurple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#A78BFA"/>
+                </marker>
+              </defs>
+
+              <!-- =============================================================
+                   ZONAS ARQUITECTÓNICAS (4 CAPAS DE SEGURIDAD Y CÓMPUTO)
+                   ============================================================= -->
+              <!-- Zona 1: Perímetro Global -->
+              <rect x="14" y="16" width="236" height="508" class="arch-zone-rect"/>
+              <text x="28" y="40" class="arch-zone-title">CAPA 1 · PERÍMETRO GLOBAL L7</text>
+
+              <!-- Zona 2: Cómputo Serverless -->
+              <rect x="266" y="16" width="224" height="508" class="arch-zone-rect"/>
+              <text x="280" y="40" class="arch-zone-title">CAPA 2 · ORQUESTACIÓN SERVERLESS</text>
+
+              <!-- Zona 3: Guardarraíles Inline Zero-Code -->
+              <rect x="506" y="16" width="300" height="508" class="arch-zone-rect"/>
+              <text x="520" y="40" class="arch-zone-title">CAPA 3 · GUARDARRAÍLES ZERO-CODE</text>
+
+              <!-- Zona 4: Vertex AI Agent Platform & Observabilidad -->
+              <rect x="822" y="16" width="284" height="508" class="arch-zone-rect"/>
+              <text x="836" y="40" class="arch-zone-title">CAPA 4 · VERTEX AI AGENTS &amp; LOGS</text>
+
+              <!-- =============================================================
+                   CONEXIONES Y FLUJOS ANIMADOS (EDGES)
+                   ============================================================= -->
+              <!-- ① Usuario -> Load Balancer + Cloud Armor WAF -->
+              <path id="edge-user-lb" d="M 132 166 L 132 232" class="arch-edge arch-edge-input" data-flows="all,input_block,output_block,allowed" marker-end="url(#arrowBlue)"/>
+              <rect x="46" y="184" width="172" height="22" rx="6" fill="#06141B" stroke="#38BDF8" stroke-width="1"/>
+              <text x="132" y="199" text-anchor="middle" fill="#38BDF8" font-size="9.5" font-family="JetBrains Mono, monospace" font-weight="600">① HTTP Request (34.117.66.159)</text>
+
+              <!-- ② Load Balancer + WAF -> Cloud Run -->
+              <path id="edge-lb-run" d="M 234 300 L 280 235" class="arch-edge arch-edge-input" data-flows="all,input_block,output_block,allowed" marker-end="url(#arrowBlue)"/>
+              <rect x="218" y="248" width="90" height="20" rx="6" fill="#06141B" stroke="#38BDF8" stroke-width="1"/>
+              <text x="263" y="261" text-anchor="middle" fill="#38BDF8" font-size="9" font-family="JetBrains Mono, monospace" font-weight="600">② Serverless NEG</text>
+
+              <!-- ③ Cloud Run -> Model Armor Floor Settings (SANITIZE_USER_PROMPT) -->
+              <path id="edge-run-armor" d="M 476 175 L 522 145" class="arch-edge arch-edge-input" data-flows="all,input_block,output_block,allowed" marker-end="url(#arrowBlue)"/>
+              <rect x="435" y="122" width="128" height="20" rx="6" fill="#06141B" stroke="#38BDF8" stroke-width="1"/>
+              <text x="499" y="135" text-anchor="middle" fill="#38BDF8" font-size="9" font-family="JetBrains Mono, monospace" font-weight="600">③ SANITIZE_USER_PROMPT</text>
+
+              <!-- ③b Bloqueo en Entrada: Model Armor -> Cloud Run (Rechazo Inmediato) -->
+              <path id="edge-armor-block-in" d="M 522 182 L 476 205" class="arch-edge arch-edge-block-in" data-flows="all,input_block" marker-end="url(#arrowRed)"/>
+              <rect x="432" y="196" width="135" height="20" rx="6" fill="#450A0A" stroke="#F87171" stroke-width="1"/>
+              <text x="499" y="209" text-anchor="middle" fill="#FCA5A5" font-size="9" font-family="JetBrains Mono, monospace" font-weight="700">🚫 Bloqueo Entrada (0 tokens)</text>
+
+              <!-- Enlace Bidireccional Model Armor <-> Cloud SDP / DLP -->
+              <path id="edge-armor-sdp" d="M 656 266 L 656 322" class="arch-edge arch-edge-block-out" data-flows="all,input_block,output_block,allowed" marker-start="url(#arrowOrange)" marker-end="url(#arrowOrange)"/>
+              <rect x="568" y="283" width="176" height="20" rx="6" fill="#06141B" stroke="#FBBF24" stroke-width="1"/>
+              <text x="656" y="296" text-anchor="middle" fill="#FCD34D" font-size="9" font-family="JetBrains Mono, monospace" font-weight="600">SDP InspectTemplate (Entrada/Salida)</text>
+
+              <!-- ④ Prompt Aprobado: Model Armor -> Vertex AI Agent Engine -->
+              <path id="edge-armor-vertex" d="M 790 132 L 836 132" class="arch-edge arch-edge-vertex" data-flows="all,output_block,allowed" marker-end="url(#arrowGreen)"/>
+              <rect x="762" y="96" width="118" height="20" rx="6" fill="#062E22" stroke="#34D399" stroke-width="1"/>
+              <text x="821" y="109" text-anchor="middle" fill="#6EE7B7" font-size="9" font-family="JetBrains Mono, monospace" font-weight="600">④ Prompt Aprobado ✅</text>
+
+              <!-- ⑤ Respuesta del Modelo: Vertex AI Agent Engine -> Model Armor (SANITIZE_MODEL_RESPONSE) -->
+              <path id="edge-vertex-armor-out" d="M 836 218 L 790 218" class="arch-edge arch-edge-block-out" data-flows="all,output_block,allowed" marker-end="url(#arrowOrange)"/>
+              <rect x="740" y="232" width="154" height="20" rx="6" fill="#2A1205" stroke="#FB923C" stroke-width="1"/>
+              <text x="817" y="245" text-anchor="middle" fill="#FDBA74" font-size="9" font-family="JetBrains Mono, monospace" font-weight="700">⑤ SANITIZE_MODEL_RESPONSE</text>
+
+              <!-- ⑥ Telemetría y Auditoría: Model Armor -> Cloud Logging -->
+              <path id="edge-armor-logs" d="M 790 250 L 836 392" class="arch-edge arch-edge-log" data-flows="all,input_block,output_block,allowed" marker-end="url(#arrowPurple)"/>
+              <rect x="748" y="314" width="136" height="20" rx="6" fill="#1E1B4B" stroke="#A78BFA" stroke-width="1"/>
+              <text x="816" y="327" text-anchor="middle" fill="#C4B5FD" font-size="9" font-family="JetBrains Mono, monospace" font-weight="600">⑥ SanitizeOperation Log</text>
+
+              <!-- Lectura de Logs en Vivo: Cloud Logging -> Cloud Run UI -->
+              <path id="edge-logs-run" d="M 836 456 L 378 456 L 378 292" class="arch-edge arch-edge-log" data-flows="all,input_block,output_block,allowed" marker-end="url(#arrowPurple)"/>
+
+              <!-- =============================================================
+                   NODOS INTERACTIVOS DE LA ARQUITECTURA (7 COMPONENTES)
+                   ============================================================= -->
+
+              <!-- NODO 1: Usuario / Cliente Web -->
+              <g id="archNode-user" class="arch-node" onclick="selectArchNode('user')" data-flows="all,input_block,output_block,allowed">
+                <rect x="30" y="64" width="204" height="100" class="arch-node-box"/>
+                <text x="46" y="92" class="arch-node-title">👤 Cliente / Navegador</text>
+                <text x="46" y="112" class="arch-node-subtitle">UI Material Design 3 (ES)</text>
+                <text x="46" y="130" class="arch-node-meta">• Playground Entrada + Salida</text>
+                <text x="46" y="146" class="arch-node-meta">• Dropdown Telemetría en Vivo</text>
+              </g>
+
+              <!-- NODO 2: Load Balancer + Cloud Armor WAF -->
+              <g id="archNode-lb_waf" class="arch-node" onclick="selectArchNode('lb_waf')" data-flows="all,input_block,output_block,allowed">
+                <rect x="30" y="236" width="204" height="154" class="arch-node-box"/>
+                <text x="46" y="264" class="arch-node-title">🌐 Global Load Balancer</text>
+                <text x="46" y="282" class="arch-node-subtitle" fill="#38BDF8">IP: 34.117.66.159 (Anycast)</text>
+                <line x1="44" y1="292" x2="218" y2="292" stroke="#4A5C6A" stroke-width="1"/>
+                <text x="46" y="310" class="arch-node-title" font-size="11.5">🛡️ Cloud Armor WAF L7</text>
+                <text x="46" y="328" class="arch-node-meta">• Prioridad 1000: Anti-SQLi</text>
+                <text x="46" y="344" class="arch-node-meta">• Prioridad 1001: Anti-XSS</text>
+                <text x="46" y="360" class="arch-node-meta">• Rate Limiting &amp; Edge Defense</text>
+                <rect x="46" y="368" width="126" height="15" rx="4" fill="#1E293B"/>
+                <text x="52" y="379" fill="#93C5FD" font-size="8.5" font-family="JetBrains Mono, monospace">terraform/network.tf</text>
+              </g>
+
+              <!-- NODO 3: Cloud Run (armor-agent-service) + IAM SA -->
+              <g id="archNode-cloud_run" class="arch-node" onclick="selectArchNode('cloud_run')" data-flows="all,input_block,output_block,allowed">
+                <rect x="280" y="128" width="196" height="162" class="arch-node-box"/>
+                <text x="296" y="156" class="arch-node-title">🚀 Cloud Run Serverless</text>
+                <text x="296" y="174" class="arch-node-subtitle" fill="#6EE7B7">armor-agent-service</text>
+                <text x="296" y="194" class="arch-node-meta">• FastAPI + ADK Client</text>
+                <text x="296" y="210" class="arch-node-meta">• Ingress: Solo Load Balancer</text>
+                <text x="296" y="226" class="arch-node-meta">• Correlación Logs por Turno</text>
+                <text x="296" y="242" class="arch-node-meta">• SA: armor-agent-sa (IAM)</text>
+                <rect x="296" y="258" width="118" height="16" rx="4" fill="#1E293B"/>
+                <text x="302" y="269" fill="#93C5FD" font-size="8.5" font-family="JetBrains Mono, monospace">terraform/main.tf + iam.tf</text>
+              </g>
+
+              <!-- NODO 4: Model Armor Floor Settings (Entrada + Salida) -->
+              <g id="archNode-model_armor" class="arch-node selected" onclick="selectArchNode('model_armor')" data-flows="all,input_block,output_block,allowed">
+                <rect x="522" y="64" width="268" height="202" class="arch-node-box arch-node-box-armor"/>
+                <text x="538" y="92" class="arch-node-title">🛡️ Model Armor Floor Settings</text>
+                <text x="538" y="110" class="arch-node-subtitle" fill="#FCD34D">locations/global/floorSetting</text>
+                <text x="538" y="126" class="arch-node-meta" fill="#FDE68A">integratedServices: [AI_PLATFORM]</text>
+                <rect x="536" y="136" width="240" height="48" rx="8" fill="#06141B" stroke="#38BDF8" stroke-width="1"/>
+                <text x="546" y="153" fill="#38BDF8" font-size="10" font-family="JetBrains Mono, monospace" font-weight="700">📥 1. SANITIZE_USER_PROMPT (Entrada)</text>
+                <text x="546" y="168" class="arch-node-meta">Bloquea PI/Jailbreak, RAI, URL y SDP en prompt</text>
+                <rect x="536" y="192" width="240" height="48" rx="8" fill="#06141B" stroke="#FB923C" stroke-width="1"/>
+                <text x="546" y="209" fill="#FB923C" font-size="10" font-family="JetBrains Mono, monospace" font-weight="700">📤 2. SANITIZE_MODEL_RESPONSE (Salida)</text>
+                <text x="546" y="224" class="arch-node-meta">Intercepta PII/SDP o URL maliciosa en respuesta</text>
+                <text x="538" y="256" fill="#93C5FD" font-size="8.5" font-family="JetBrains Mono, monospace">Zero-Code Inline · INSPECT_AND_BLOCK / INSPECT_ONLY</text>
+              </g>
+
+              <!-- NODO 5: Sensitive Data Protection (Cloud SDP / DLP) -->
+              <g id="archNode-sdp_dlp" class="arch-node" onclick="selectArchNode('sdp_dlp')" data-flows="all,input_block,output_block,allowed">
+                <rect x="522" y="324" width="268" height="174" class="arch-node-box arch-node-box-sdp"/>
+                <text x="538" y="350" class="arch-node-title">🔍 Cloud SDP / DLP Integrado</text>
+                <text x="538" y="368" class="arch-node-subtitle" fill="#FCD34D">armor-sdp-inspect-us-central1</text>
+                <text x="538" y="388" class="arch-node-meta">• CREDIT_CARD_NUMBER (Tarjetas Luhn)</text>
+                <text x="538" y="404" class="arch-node-meta">• US_SOCIAL_SECURITY_NUMBER (SSN)</text>
+                <text x="538" y="420" class="arch-node-meta">• GCP_API_KEY &amp; AUTH_TOKEN</text>
+                <text x="538" y="436" class="arch-node-meta">• PASSWORD &amp; ENCRYPTION_KEY</text>
+                <text x="538" y="454" class="arch-node-meta" fill="#FDE68A">Actúa en Prompt de Entrada y Respuesta LLM</text>
+                <rect x="538" y="466" width="114" height="16" rx="4" fill="#1E293B"/>
+                <text x="544" y="477" fill="#93C5FD" font-size="8.5" font-family="JetBrains Mono, monospace">terraform/sdp.tf</text>
+              </g>
+
+              <!-- NODO 6: Vertex AI Agent Engine (ReasoningEngines + CRM/RRHH) -->
+              <g id="archNode-vertex_agents" class="arch-node" onclick="selectArchNode('vertex_agents')" data-flows="all,output_block,allowed">
+                <rect x="836" y="64" width="256" height="220" class="arch-node-box arch-node-box-vertex"/>
+                <text x="852" y="92" class="arch-node-title">🧠 Vertex AI Agent Engine</text>
+                <text x="852" y="110" class="arch-node-subtitle" fill="#6EE7B7">Google ADK · ReasoningEngines</text>
+                <rect x="850" y="120" width="228" height="42" rx="7" fill="#06141B" stroke="#34D399" stroke-width="1"/>
+                <text x="860" y="136" fill="#6EE7B7" font-size="10" font-family="JetBrains Mono, monospace" font-weight="700">1. gemini-4-argon (Primario)</text>
+                <text x="860" y="151" class="arch-node-meta">ID: 8735527798581493760</text>
+                <rect x="850" y="168" width="228" height="42" rx="7" fill="#06141B" stroke="#38BDF8" stroke-width="1"/>
+                <text x="860" y="184" fill="#38BDF8" font-size="10" font-family="JetBrains Mono, monospace" font-weight="700">2. gemini-3.8-flash (Baja Latencia)</text>
+                <text x="860" y="199" class="arch-node-meta">ID: 1635602986031906816</text>
+                <text x="852" y="228" class="arch-node-meta" fill="#FCD34D">🗄️ Herramientas Conectadas al Agente:</text>
+                <text x="852" y="244" class="arch-node-meta">• CRM (Juan Pérez) · RRHH (María López)</text>
+                <text x="852" y="260" class="arch-node-meta">• Catálogo Externo de Proveedores</text>
+              </g>
+
+              <!-- NODO 7: Cloud Logging (SanitizeOperation) -->
+              <g id="archNode-cloud_logging" class="arch-node" onclick="selectArchNode('cloud_logging')" data-flows="all,input_block,output_block,allowed">
+                <rect x="836" y="356" width="256" height="142" class="arch-node-box"/>
+                <text x="852" y="384" class="arch-node-title">📜 Google Cloud Logging</text>
+                <text x="852" y="402" class="arch-node-subtitle" fill="#C4B5FD">modelarmor.../SanitizeOperation</text>
+                <text x="852" y="422" class="arch-node-meta">• Audita SANITIZE_USER_PROMPT</text>
+                <text x="852" y="438" class="arch-node-meta">• Audita SANITIZE_MODEL_RESPONSE</text>
+                <text x="852" y="454" class="arch-node-meta">• Veredictos: BLOQUEADO / AUDITORÍA</text>
+                <text x="852" y="470" class="arch-node-meta">• Exportación JSON + CLI gcloud</text>
+              </g>
+
+            </svg>
+          </div>
+
+          <!-- Panel Inspector del Nodo Seleccionado en el Diagrama -->
+          <div id="archNodeDetailCard" class="p-4 rounded-xl bg-slate-900/90 border border-slate-700/80 text-xs space-y-2">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-700/60">
+              <div class="flex items-center gap-2">
+                <span id="archDetailTitle" class="text-sm font-bold text-white">🛡️ Model Armor Floor Settings (Inspección Bidireccional Zero-Code)</span>
+                <span id="archDetailLayer" class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">CAPA 3 · GUARDARRAÍLES INLINE</span>
+              </div>
+              <span id="archDetailTfFile" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-blue-300 border border-slate-700">
+                Terraform: terraform/main.tf + terraform/sdp.tf
+              </span>
+            </div>
+            <p id="archDetailDesc" class="text-slate-200 leading-relaxed">
+              Política global aplicada a nivel de proyecto (<code>projects/armor-agent-demo-mau/locations/global/floorSetting</code>) con <code>integratedServices: [AI_PLATFORM]</code>. Intercepta automáticamente todas las llamadas hacia y desde Vertex AI sin requerir llamadas manuales al SDK de seguridad en el código del agente: evalúa el prompt del usuario en <code>SANITIZE_USER_PROMPT</code> y evalúa la respuesta generada por el modelo en <code>SANITIZE_MODEL_RESPONSE</code>.
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 font-mono text-[10px]">
+              <div class="p-2 rounded-lg bg-slate-950/70 border border-slate-800">
+                <span class="text-slate-400 block">Recurso Real en GCP:</span>
+                <span id="archDetailResource" class="text-emerald-300 break-all">projects/armor-agent-demo-mau/locations/global/floorSetting</span>
+              </div>
+              <div class="p-2 rounded-lg bg-slate-950/70 border border-slate-800">
+                <span class="text-slate-400 block">Controles / Detectores Clave:</span>
+                <span id="archDetailControls" class="text-amber-300">PI &amp; Jailbreak · SDP (Tarjetas, SSN, API Keys) · RAI · Malicious URI · CSAM</span>
+              </div>
+            </div>
+          </div>
+
         </div>
-        <div id="armorStatusBadge" class="mt-3 flex items-center gap-2 text-xs font-medium text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">
-          <i class="fa-solid fa-circle-check"></i>
-          <span>PROTEGIDO: Prompts y Respuestas sanitizadas</span>
+
+        <!-- Desglose de Infraestructura como Código (Terraform) y Capas implementadas -->
+        <div class="md3-card space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-700/60">
+            <div>
+              <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-terminal text-blue-300"></i> Mapeo de Componentes e Infraestructura como Código (Terraform)
+              </h3>
+              <p class="text-[11px] text-slate-400 mt-0.5">
+                Haz clic en cualquier tarjeta para resaltar el componente en el diagrama superior
+              </p>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              100% Parametrizado para Clientes
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+            
+            <!-- Card 1: Perímetro & WAF -->
+            <div onclick="selectArchNode('lb_waf')" class="policy-rule-card cursor-pointer space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white flex items-center gap-1.5">
+                  <i class="fa-solid fa-network-wired text-blue-300"></i> 1. Load Balancer + Cloud Armor
+                </span>
+                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-blue-300 border border-slate-700">network.tf</span>
+              </div>
+              <p class="text-[11px] text-slate-300 leading-snug">
+                Balanceador HTTP(S) Global Anycast (<code>34.117.66.159</code>) con Serverless NEG y política WAF L7 contra SQLi (<code>sqli-v33-stable</code>) y XSS (<code>xss-v33-stable</code>).
+              </p>
+            </div>
+
+            <!-- Card 2: Cloud Run + IAM -->
+            <div onclick="selectArchNode('cloud_run')" class="policy-rule-card cursor-pointer space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white flex items-center gap-1.5">
+                  <i class="fa-solid fa-server text-emerald-400"></i> 2. Cloud Run + Least-Privilege IAM
+                </span>
+                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-blue-300 border border-slate-700">main.tf · iam.tf</span>
+              </div>
+              <p class="text-[11px] text-slate-300 leading-snug">
+                Servicio <code>armor-agent-service</code> con ingress restringido al balanceador y Service Account dedicada (<code>armor-agent-sa</code>) con roles mínimos.
+              </p>
+            </div>
+
+            <!-- Card 3: Model Armor Floor Settings -->
+            <div onclick="selectArchNode('model_armor')" class="policy-rule-card cursor-pointer space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white flex items-center gap-1.5">
+                  <i class="fa-solid fa-shield-halved text-amber-400"></i> 3. Model Armor Floor Settings
+                </span>
+                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-blue-300 border border-slate-700">main.tf</span>
+              </div>
+              <p class="text-[11px] text-slate-300 leading-snug">
+                Guardarraíl Zero-Code en <code>locations/global/floorSetting</code> que inspecciona tanto <code>SANITIZE_USER_PROMPT</code> como <code>SANITIZE_MODEL_RESPONSE</code>.
+              </p>
+            </div>
+
+            <!-- Card 4: Cloud SDP / DLP -->
+            <div onclick="selectArchNode('sdp_dlp')" class="policy-rule-card cursor-pointer space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white flex items-center gap-1.5">
+                  <i class="fa-solid fa-credit-card text-amber-300"></i> 4. Sensitive Data Protection (SDP)
+                </span>
+                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-blue-300 border border-slate-700">sdp.tf</span>
+              </div>
+              <p class="text-[11px] text-slate-300 leading-snug">
+                Plantilla <code>armor-sdp-inspect-us-central1</code> vinculada a Model Armor para detectar Tarjetas, SSN, API Keys, Tokens y Contraseñas en entrada y salida.
+              </p>
+            </div>
+
+            <!-- Card 5: Vertex AI Agent Engine -->
+            <div onclick="selectArchNode('vertex_agents')" class="policy-rule-card cursor-pointer space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white flex items-center gap-1.5">
+                  <i class="fa-solid fa-brain text-emerald-300"></i> 5. Vertex AI Agent Engine (ADK)
+                </span>
+                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-blue-300 border border-slate-700">agent.py</span>
+              </div>
+              <p class="text-[11px] text-slate-300 leading-snug">
+                ReasoningEngines desplegados en <code>us-central1</code> ejecutando exclusivamente <code>gemini-4-argon</code> y <code>gemini-3.8-flash</code> con acceso a CRM/RRHH.
+              </p>
+            </div>
+
+            <!-- Card 6: Cloud Logging SanitizeOperation -->
+            <div onclick="selectArchNode('cloud_logging')" class="policy-rule-card cursor-pointer space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white flex items-center gap-1.5">
+                  <i class="fa-solid fa-file-waveform text-purple-300"></i> 6. Cloud Logging &amp; Auditoría
+                </span>
+                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-blue-300 border border-slate-700">model_armor.py</span>
+              </div>
+              <p class="text-[11px] text-slate-300 leading-snug">
+                Ingesta automática en <code>modelarmor.googleapis.com/SanitizeOperation</code> correlacionando el prompt de entrada y la respuesta interceptada del modelo.
+              </p>
+            </div>
+
+          </div>
         </div>
+
       </div>
 
-      <!-- Control 2: Model Selector -->
-      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 shadow-sm space-y-2">
-        <label for="modelSelect" class="block text-xs font-semibold text-slate-300 flex items-center gap-2">
-          <i class="fa-solid fa-brain text-blue-400"></i> Modelo en Vertex AI (Agnóstico con Model Armor)
-        </label>
-        <select id="modelSelect" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono">
-          <optgroup label="🔹 Google Gemini 2.5 (GA)">
-            <option value="gemini-2.5-flash" selected>gemini-2.5-flash (Recomendado - Baja Latencia)</option>
-            <option value="gemini-2.5-pro">gemini-2.5-pro (Razonamiento Complejo)</option>
-            <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (Ultra Rápido / Económico)</option>
-          </optgroup>
-          <optgroup label="🚀 Google Gemini 3 (Nueva Generación)">
-            <option value="gemini-3-flash-preview">gemini-3-flash-preview (Gemini 3.0 Flash)</option>
-            <option value="gemini-3-pro-preview">gemini-3-pro-preview (Gemini 3.0 Pro)</option>
-            <option value="gemini-3.1-pro-preview">gemini-3.1-pro-preview (Gemini 3.1 Pro)</option>
-            <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite (Gemini 3.1 Flash-Lite)</option>
-          </optgroup>
-          <optgroup label="🌐 Terceros / Open Models (Vertex Model Garden)">
-            <option value="openai/gpt-oss-120b-maas">openai/gpt-oss-120b-maas (OpenAI GPT-OSS 120B)</option>
-            <option value="meta/llama-3.3-70b-instruct-maas">meta/llama-3.3-70b-instruct-maas (Meta Llama 3.3 70B)</option>
-            <option value="google/gemma-4-26b-a4b-it-maas">google/gemma-4-26b-a4b-it-maas (Gemma 4 26B Open)</option>
-            <option value="deepseek-ai/deepseek-v4.1-flash-maas">deepseek-ai/deepseek-v4.1-flash-maas (DeepSeek V4.1 Flash)</option>
-            <option value="deepseek-ai/deepseek-r1-0528-maas">deepseek-ai/deepseek-r1-0528-maas (DeepSeek R1)</option>
-          </optgroup>
-        </select>
-      </div>
+    </section>
 
-      <!-- Control 3: Informative GCP Template & Security Rules Status -->
-      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 shadow-sm space-y-3">
-        <div class="flex items-center justify-between">
-          <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-            <i class="fa-solid fa-layer-group text-indigo-400"></i> Template en GCP (Solo Lectura)
-          </h3>
-          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 font-semibold">
-            armor-agent-template
-          </span>
-        </div>
+    <!-- -----------------------------------------------------------------------
+         TAB 3: Auditoría del Turno (Telemetry, Verdicts & Live Model Proof)
+         ----------------------------------------------------------------------- -->
+    <section id="tabPanelAudit" class="md3-tab-panel hidden flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-[var(--md-sys-color-surface-container-low)]" role="tabpanel" aria-labelledby="tabBtnAudit">
+      
+      <div class="max-w-4xl mx-auto space-y-4">
         
-        <div class="space-y-2 text-xs">
-          <!-- Jailbreak Filter Status -->
-          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-900/50 border border-slate-700/40">
-            <span class="text-slate-200 flex items-center gap-2">
-              <i class="fa-solid fa-user-ninja text-red-400"></i> PI & Jailbreak Filter
-            </span>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold flex items-center gap-1 border border-emerald-500/20">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Activo (GCP)
-            </span>
-          </div>
-
-          <!-- PII / SDP Filter Status -->
-          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-900/50 border border-slate-700/40">
-            <span class="text-slate-200 flex items-center gap-2">
-              <i class="fa-solid fa-id-card text-amber-400"></i> Sensitive Data (SDP / PII)
-            </span>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold flex items-center gap-1 border border-emerald-500/20">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Activo (GCP)
+        <!-- Tarjeta Principal de Auditoría del Turno -->
+        <div class="md3-card space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-700/60">
+            <div>
+              <h2 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-magnifying-glass-chart text-emerald-400"></i> Auditoría Bidireccional de Seguridad (Último Turno)
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Inspección inline de Entrada (<code>SANITIZE_USER_PROMPT</code>) y de Respuesta del Modelo (<code>SANITIZE_MODEL_RESPONSE</code>) por Vertex AI Floor Settings
+              </p>
+            </div>
+            <span id="telemetryStatus" class="text-xs px-3 py-1 rounded-full bg-slate-700 text-slate-200 font-mono font-semibold">
+              En espera
             </span>
           </div>
 
-          <!-- Toxicity / RAI Status -->
-          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-900/50 border border-slate-700/40">
-            <span class="text-slate-200 flex items-center gap-2">
-              <i class="fa-solid fa-biohazard text-purple-400"></i> Responsible AI (RAI)
-            </span>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold flex items-center gap-1 border border-emerald-500/20">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Activo (GCP)
-            </span>
+          <!-- Métricas de Telemetría en Grilla (4 Columnas: Entrada, Salida, Latencia, Modelo) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            
+            <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/50">
+              <span class="text-[11px] text-slate-400 block mb-1">1. Entrada (USER_PROMPT):</span>
+              <span id="statPromptAction" class="text-sm text-slate-200 font-bold font-mono">-</span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/50">
+              <span class="text-[11px] text-slate-400 block mb-1">2. Respuesta (MODEL_RESPONSE):</span>
+              <span id="statOutputAction" class="text-sm text-slate-200 font-bold font-mono">-</span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/50">
+              <span class="text-[11px] text-slate-400 block mb-1">Latencia Vertex AI + Armor:</span>
+              <span id="statArmorLatency" class="text-sm text-slate-200 font-bold font-mono">-</span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/50">
+              <span class="text-[11px] text-slate-400 block mb-1">Ejecución del Modelo:</span>
+              <span id="statLlmLatency" class="text-sm text-slate-200 font-bold font-mono">-</span>
+            </div>
+
           </div>
 
-          <!-- Malicious URLs Status -->
-          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-900/50 border border-slate-700/40">
-            <span class="text-slate-200 flex items-center gap-2">
-              <i class="fa-solid fa-link-slash text-cyan-400"></i> Malicious URIs
+          <!-- Desglose de Filtros Disparados o Prueba de Ejecución Real del Modelo (Dropdown) -->
+          <div class="space-y-2 pt-2">
+            <span class="text-xs font-semibold text-slate-300 block">
+              Detalle de Inspección (Entrada y Salida) / Respuesta Real del Modelo (No Mock):
             </span>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold flex items-center gap-1 border border-emerald-500/20">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Activo (GCP)
-            </span>
+            <div id="statMatchDetails" class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-700/70 text-xs text-slate-300 leading-relaxed">
+              Ninguna violación detectada. Envía una consulta o prueba rápida para visualizar la auditoría en vivo.
+            </div>
           </div>
+
         </div>
+
+        <!-- Tarjeta Informativa de Arquitectura Zero-Code -->
+        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-700/40 text-xs space-y-2 text-slate-300">
+          <div class="font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-circle-check text-emerald-400"></i> Garantía de Inspección Bidireccional en GCP
+          </div>
+          <p class="leading-relaxed">
+            Model Armor Floor Settings inspecciona tanto el <strong>prompt de entrada</strong> (<code>SANITIZE_USER_PROMPT</code>) como la <strong>respuesta generada por el modelo</strong> (<code>SANITIZE_MODEL_RESPONSE</code>). Cuando el prompt es limpio pero la respuesta del modelo contiene PII (ej. tarjeta o SSN de un expediente) o un enlace malicioso, el modelo se ejecuta en <strong>Vertex AI Reasoning Engine</strong> y Model Armor intercepta la salida antes de entregarla al usuario.
+          </p>
+        </div>
+
       </div>
 
-      <!-- Realtime Inspection Card -->
-      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 shadow-sm space-y-3">
-        <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center justify-between">
-          <span class="flex items-center gap-2">
-            <i class="fa-solid fa-magnifying-glass-chart text-emerald-400"></i> Auditoría de Seguridad (Último Turno)
-          </span>
-          <span id="telemetryStatus" class="text-[10px] px-2 py-0.5 rounded bg-slate-700 text-slate-300">En espera</span>
-        </h3>
+    </section>
 
-        <div id="telemetryContent" class="space-y-2 text-xs font-mono">
-          <div class="flex justify-between py-1 border-b border-slate-700/60">
-            <span class="text-slate-400 font-sans">Acción Prompt:</span>
-            <span id="statPromptAction" class="text-slate-300 font-bold">-</span>
+    <!-- -----------------------------------------------------------------------
+         TAB 4: Políticas y Detectores Activos (Model Armor + SDP + WAF)
+         ----------------------------------------------------------------------- -->
+    <section id="tabPanelPolicies" class="md3-tab-panel hidden flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-[var(--md-sys-color-surface-container-low)]" role="tabpanel" aria-labelledby="tabBtnPolicies">
+      
+      <div class="max-w-4xl mx-auto space-y-4">
+        
+        <div class="md3-card space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-700/60">
+            <div>
+              <h2 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-layer-group text-blue-300"></i> Políticas, Reglas y Detectores Activos
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Lo que <strong>NO pasará</strong> ni en Entrada ni en Respuesta gracias a <code>Model Armor</code>, <code>SDP (Cloud DLP)</code> y <code>Cloud Armor</code>
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="policyModeBadge" class="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-indigo-500/15 text-blue-300 border border-indigo-500/30 font-semibold">
+                global/floorSetting
+              </span>
+              <span id="floorEnforcementBadge" class="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold">
+                AI_PLATFORM + SDP
+              </span>
+            </div>
           </div>
-          <div class="flex justify-between py-1 border-b border-slate-700/60">
-            <span class="text-slate-400 font-sans">Latencia Armor:</span>
-            <span id="statArmorLatency" class="text-slate-300">-</span>
-          </div>
-          <div class="flex justify-between py-1 border-b border-slate-700/60">
-            <span class="text-slate-400 font-sans">Latencia LLM:</span>
-            <span id="statLlmLatency" class="text-slate-300">-</span>
-          </div>
-          <div class="py-1">
-            <span class="text-slate-400 font-sans block mb-1">Filtros Activados / Matches:</span>
-            <div id="statMatchDetails" class="bg-slate-900 p-2 rounded-lg text-[11px] text-slate-400 max-h-28 overflow-y-auto leading-snug">
-              Ninguna violación detectada.
+
+          <!-- Contenedor Dinámico de Reglas, Detectores SDP y Reglas WAF -->
+          <div id="policiesBreakdownContainer" class="space-y-3">
+            <div class="text-xs text-slate-300 p-4 bg-slate-900/50 rounded-xl text-center">
+              Consultando políticas activas de Model Armor y SDP en GCP...
             </div>
           </div>
         </div>
+
       </div>
 
-    </aside>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         TAB 5: Cloud Logging en Vivo (Live SanitizeOperation Logs)
+         ----------------------------------------------------------------------- -->
+    <section id="tabPanelLogs" class="md3-tab-panel hidden flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-[var(--md-sys-color-surface-container-low)]" role="tabpanel" aria-labelledby="tabBtnLogs">
+      
+      <div class="max-w-4xl mx-auto space-y-4">
+        
+        <div class="md3-card space-y-4">
+          
+          <div class="flex items-center justify-between pb-2 border-b border-slate-700/60">
+            <div>
+              <h2 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-file-waveform text-blue-300"></i> Registros de Model Armor (Cloud Logging)
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Eventos reales ingeridos en <code>modelarmor.googleapis.com/SanitizeOperation</code> (<code>SANITIZE_USER_PROMPT</code> y <code>SANITIZE_MODEL_RESPONSE</code>)
+              </p>
+            </div>
+            <button id="refreshLogsBtn" type="button" class="btn-action-secondary" title="Actualizar registros desde Cloud Logging">
+              <i id="refreshLogsIcon" class="fa-solid fa-rotate text-xs"></i>
+              <span>Actualizar Logs</span>
+            </button>
+          </div>
+
+          <!-- Barra de Herramientas: Consola GCP y Comando gcloud -->
+          <div class="space-y-2 bg-slate-900/70 p-3 rounded-xl border border-slate-700/50">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+                <i class="fa-solid fa-terminal text-blue-300"></i> Verificar con CLI o Consola GCP:
+              </span>
+              <div class="flex items-center gap-2">
+                <button id="copyGcloudBtn" type="button" class="btn-action-secondary">
+                  <i class="fa-solid fa-copy text-xs"></i>
+                  <span id="copyGcloudLabel">Copiar comando gcloud</span>
+                </button>
+                <a id="openConsoleLink" href="https://console.cloud.google.com/logs/query" target="_blank" rel="noopener noreferrer" class="btn-console-link">
+                  <span>Abrir en Consola GCP</span>
+                  <i class="fa-solid fa-up-right-from-square text-[10px]"></i>
+                </a>
+              </div>
+            </div>
+            <div id="gcloudCommandBox" class="cmd-box font-mono text-xs">
+              gcloud logging read 'resource.type="modelarmor.googleapis.com/SanitizeOperation" AND labels."modelarmor.googleapis.com/client_name"="VERTEX_AI"' --limit=10 --format=json
+            </div>
+          </div>
+
+          <!-- Lista de Registros en Vivo de Cloud Logging -->
+          <div id="cloudLogsList" class="logs-scroll-area space-y-3">
+            <div class="text-xs text-slate-300 p-4 bg-slate-900/50 rounded-xl text-center">
+              Cargando registros recientes desde Google Cloud Logging...
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
   </main>
 
-  <!-- Frontend Logic -->
-  <script src="/static/app.js?v=3"></script>
+  <!-- Lógica Frontend con Cache-Busting Versioning v=20261019-v4 -->
+  <script src="/static/app.js?v=20261019-v4"></script>
 </body>
 </html>

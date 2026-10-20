@@ -1,21 +1,209 @@
-/* Self-contained stylesheet for Armor Agent Demo (No external CDN dependencies) */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+/* ============================================================================
+   Material Design 3 (M3) Stylesheet — Armor Agent Live Demo Overhaul (Milestone 2)
+   Paleta Oficial Google Cloud Model Armor + Vertex AI:
+     #06141B (Obsidian Navy — Fondo Profundo)
+     #11212D (Midnight Slate — Superficies Principales)
+     #253745 (Steel Slate Container — Tarjetas y Contenedores)
+     #4A5C6A (Muted Steel Blue-Grey — Bordes y Detalles Secundarios)
+     #9BA8AB (Cool Silver Mist — Acentos y Subtítulos)
+     #CCD0CF (Crisp Alabaster Grey — Texto Principal y Superficies Claras)
+   Soporta Tema Oscuro (data-theme="dark") y Tema Claro (data-theme="light")
+   WCAG 2.1 AA / AAA Contrast Compliant
+   ============================================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Plus+Jakarta+Sans:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
+:root,
+html[data-theme="dark"] {
+  /* Paleta Base Oficial (6 Tonos) */
+  --palette-deep-bg: #06141B;
+  --palette-dark-surface: #11212D;
+  --palette-intermediate-card: #253745;
+  --palette-muted-accent: #4A5C6A;
+  --palette-highlight-accent: #9BA8AB;
+  --palette-light-surface: #CCD0CF;
+
+  /* Mapeo Numérico Retrocompatible */
+  --palette-950: #06141B;
+  --palette-900: #11212D;
+  --palette-800: #253745;
+  --palette-600: #4A5C6A;
+  --palette-400: #9BA8AB;
+  --palette-200: #CCD0CF;
+
+  /* Material Design 3 Color Tokens — Tema Oscuro */
+  --md-sys-color-background: #06141B;
+  --md-sys-color-on-background: #CCD0CF;
+
+  --md-sys-color-surface: #06141B;
+  --md-sys-color-surface-dim: #040E13;
+  --md-sys-color-surface-container-lowest: #040E13;
+  --md-sys-color-surface-container-low: #11212D;
+  --md-sys-color-surface-container: #11212D;
+  --md-sys-color-surface-container-high: #253745;
+  --md-sys-color-surface-container-highest: #4A5C6A;
+
+  --md-sys-color-on-surface: #CCD0CF;
+  --md-sys-color-on-surface-strong: #FFFFFF;
+  --md-sys-color-on-surface-variant: #9BA8AB;
+  --md-sys-color-on-surface-muted: #9BA8AB;
+
+  --md-sys-color-primary: #9BA8AB;
+  --md-sys-color-on-primary: #06141B;
+  --md-sys-color-primary-container: #253745;
+  --md-sys-color-on-primary-container: #CCD0CF;
+
+  --md-sys-color-secondary: #4A5C6A;
+  --md-sys-color-on-secondary: #CCD0CF;
+  --md-sys-color-secondary-container: #253745;
+  --md-sys-color-on-secondary-container: #9BA8AB;
+
+  --md-sys-color-outline: #4A5C6A;
+  --md-sys-color-outline-variant: rgba(74, 92, 106, 0.48);
+
+  /* Navegación por Pestañas (Tabs) */
+  --md-tab-active-indicator: #9BA8AB;
+  --md-tab-active-text: #FFFFFF;
+  --md-tab-inactive-text: #9BA8AB;
+  --md-tab-hover-bg: rgba(74, 92, 106, 0.22);
+  --md-tab-active-bg: rgba(37, 55, 69, 0.4);
+
+  /* Barra de Comandos */
+  --md-command-bar-bg: #11212D;
+  --md-command-control-bg: rgba(6, 20, 27, 0.75);
+  --md-command-control-border: rgba(74, 92, 106, 0.55);
+
+  /* Burbujas de Chat M3 */
+  --md-user-bubble-bg: #253745;
+  --md-user-bubble-border: #4A5C6A;
+  --md-user-bubble-text: #CCD0CF;
+  --md-user-bubble-meta: #9BA8AB;
+
+  --md-bot-bubble-bg: #11212D;
+  --md-bot-bubble-border: rgba(74, 92, 106, 0.55);
+  --md-bot-bubble-text: #CCD0CF;
+
+  /* Estados Semánticos M3 (Armonizados con la paleta y WCAG Compliant) */
+  --md-status-safe-bg: rgba(16, 185, 129, 0.14);
+  --md-status-safe-border: rgba(52, 211, 153, 0.42);
+  --md-status-safe-text: #6EE7B7;
+
+  --md-status-warn-bg: rgba(245, 158, 11, 0.15);
+  --md-status-warn-border: rgba(251, 191, 36, 0.45);
+  --md-status-warn-text: #FCD34D;
+
+  --md-status-error-bg: rgba(127, 29, 29, 0.35);
+  --md-status-error-border: rgba(248, 113, 113, 0.65);
+  --md-status-error-text: #FECACA;
+  --md-status-error-strong: #F87171;
+
+  /* Elevaciones M3 */
+  --md-elevation-1: 0 1px 3px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.35);
+  --md-elevation-2: 0 4px 12px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.35);
+  --md-elevation-3: 0 8px 24px rgba(0, 0, 0, 0.6);
+
+  /* Bloques de código */
+  --md-code-bg: #040E13;
+  --md-code-text: #CCD0CF;
+  --md-code-accent: #9BA8AB;
+}
+
+html[data-theme="light"] {
+  /* Material Design 3 Color Tokens — Tema Claro */
+  --md-sys-color-background: #CCD0CF;
+  --md-sys-color-on-background: #06141B;
+
+  --md-sys-color-surface: #CCD0CF;
+  --md-sys-color-surface-dim: #BFC5C4;
+  --md-sys-color-surface-container-lowest: #FFFFFF;
+  --md-sys-color-surface-container-low: #EAEDED;
+  --md-sys-color-surface-container: #E0E4E3;
+  --md-sys-color-surface-container-high: #D6DBDA;
+  --md-sys-color-surface-container-highest: #9BA8AB;
+
+  --md-sys-color-on-surface: #06141B;
+  --md-sys-color-on-surface-strong: #06141B;
+  --md-sys-color-on-surface-variant: #253745;
+  --md-sys-color-on-surface-muted: #253745;
+
+  --md-sys-color-primary: #11212D;
+  --md-sys-color-on-primary: #CCD0CF;
+  --md-sys-color-primary-container: #253745;
+  --md-sys-color-on-primary-container: #CCD0CF;
+
+  --md-sys-color-secondary: #253745;
+  --md-sys-color-on-secondary: #CCD0CF;
+  --md-sys-color-secondary-container: #9BA8AB;
+  --md-sys-color-on-secondary-container: #06141B;
+
+  --md-sys-color-outline: #4A5C6A;
+  --md-sys-color-outline-variant: rgba(37, 55, 69, 0.28);
+
+  /* Navegación por Pestañas (Tabs) en Tema Claro */
+  --md-tab-active-indicator: #11212D;
+  --md-tab-active-text: #06141B;
+  --md-tab-inactive-text: #253745;
+  --md-tab-hover-bg: rgba(37, 55, 69, 0.08);
+  --md-tab-active-bg: rgba(37, 55, 69, 0.14);
+
+  /* Barra de Comandos en Tema Claro */
+  --md-command-bar-bg: #EAEDED;
+  --md-command-control-bg: #FFFFFF;
+  --md-command-control-border: rgba(37, 55, 69, 0.3);
+
+  /* Burbujas de Chat M3 en Tema Claro */
+  --md-user-bubble-bg: #11212D;
+  --md-user-bubble-border: #06141B;
+  --md-user-bubble-text: #CCD0CF;
+  --md-user-bubble-meta: #9BA8AB;
+
+  --md-bot-bubble-bg: #FFFFFF;
+  --md-bot-bubble-border: rgba(74, 92, 106, 0.35);
+  --md-bot-bubble-text: #06141B;
+
+  /* Estados Semánticos M3 en Tema Claro */
+  --md-status-safe-bg: rgba(5, 150, 105, 0.12);
+  --md-status-safe-border: rgba(4, 120, 87, 0.5);
+  --md-status-safe-text: #065F46;
+
+  --md-status-warn-bg: rgba(217, 119, 6, 0.14);
+  --md-status-warn-border: rgba(180, 83, 9, 0.5);
+  --md-status-warn-text: #78350F;
+
+  --md-status-error-bg: rgba(220, 38, 38, 0.12);
+  --md-status-error-border: rgba(185, 28, 28, 0.6);
+  --md-status-error-text: #7F1D1D;
+  --md-status-error-strong: #991B1B;
+
+  /* Elevaciones M3 en Tema Claro */
+  --md-elevation-1: 0 1px 3px rgba(6, 20, 27, 0.12), 0 1px 2px rgba(6, 20, 27, 0.08);
+  --md-elevation-2: 0 4px 12px rgba(6, 20, 27, 0.15), 0 2px 4px rgba(6, 20, 27, 0.1);
+  --md-elevation-3: 0 8px 24px rgba(6, 20, 27, 0.18);
+
+  /* Bloques de código (Terminal de Alto Contraste) */
+  --md-code-bg: #11212D;
+  --md-code-text: #CCD0CF;
+  --md-code-accent: #9BA8AB;
+}
+
+/* ============================================================================
+   Reset & Base Typography (Material Design 3 Type Scale)
+   ============================================================================ */
 *, ::before, ::after {
   box-sizing: border-box;
   border-width: 0;
   border-style: solid;
-  border-color: #334155;
+  border-color: var(--md-sys-color-outline-variant);
 }
 
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background-color: #0f172a;
-  color: #f1f5f9;
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-surface);
+  font-family: 'Roboto', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s cubic-bezier(0.2, 0, 0, 1), color 0.25s cubic-bezier(0.2, 0, 0, 1);
 }
 
 h1, h2, h3, h4, p {
@@ -37,8 +225,8 @@ button {
 }
 
 select option, select optgroup {
-  background-color: #0f172a;
-  color: #e2e8f0;
+  background-color: var(--md-sys-color-surface-container-low);
+  color: var(--md-sys-color-on-surface);
 }
 
 code, pre, .font-mono {
@@ -46,16 +234,1037 @@ code, pre, .font-mono {
 }
 
 .font-sans {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Roboto', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* Custom Scrollbar */
+/* Custom M3 Scrollbars */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
-::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.8); border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 1); }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--md-sys-color-outline);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--md-sys-color-on-surface-variant);
+}
 
-/* Layout & Flexbox */
+/* ============================================================================
+   1. Material Design 3 Top Command Bar & Global Header
+   ============================================================================ */
+.md3-top-app-bar {
+  background-color: var(--md-command-bar-bg);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  box-shadow: var(--md-elevation-1);
+  transition: background-color 0.25s cubic-bezier(0.2, 0, 0, 1), border-color 0.25s ease;
+}
+
+.md3-brand-avatar {
+  width: 2.65rem;
+  height: 2.65rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #11212D 0%, #253745 55%, #4A5C6A 100%);
+  border: 1px solid var(--md-sys-color-outline);
+  color: #CCD0CF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--md-elevation-1);
+  flex-shrink: 0;
+}
+
+/* Selector Compacto para Barra de Comandos */
+.md3-select-compact {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: 10px;
+  padding: 0.35rem 1.6rem 0.35rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%239BA8AB'%3e%3cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3e");
+  background-position: right 0.45rem center;
+  background-repeat: no-repeat;
+  background-size: 0.85em;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.md3-select-compact:hover {
+  border-color: var(--md-sys-color-primary);
+  background-color: var(--md-sys-color-surface-container-highest);
+}
+
+.md3-select-compact:focus {
+  outline: none;
+  border-color: var(--md-sys-color-primary);
+  box-shadow: 0 0 0 2px rgba(74, 92, 106, 0.35);
+}
+
+html[data-theme="light"] .md3-select-compact {
+  background-color: #FFFFFF;
+  color: #06141B;
+  border-color: #4A5C6A;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2311212D'%3e%3cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3e");
+}
+
+/* Floor Setting Switch en Barra de Comandos */
+.md3-switch-track {
+  width: 2.2rem;
+  height: 1.25rem;
+  background-color: var(--md-sys-color-surface-container-highest);
+  border: 1.5px solid var(--md-sys-color-outline);
+  border-radius: 9999px;
+  position: relative;
+  transition: all 0.22s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.md3-switch-thumb {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 0.95rem;
+  height: 0.95rem;
+  background-color: #CCD0CF;
+  border-radius: 9999px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  transition: transform 0.22s cubic-bezier(0.2, 0, 0, 1), background-color 0.22s ease;
+}
+
+#masterArmorToggle:checked + .md3-switch-track {
+  background-color: #253745;
+  border-color: #34D399;
+}
+
+#masterArmorToggle:checked + .md3-switch-track .md3-switch-thumb {
+  transform: translateX(0.95rem);
+  background-color: #34D399;
+}
+
+html[data-theme="light"] #masterArmorToggle:checked + .md3-switch-track {
+  background-color: #11212D;
+  border-color: #047857;
+}
+
+html[data-theme="light"] #masterArmorToggle:checked + .md3-switch-track .md3-switch-thumb {
+  background-color: #059669;
+}
+
+/* Retrocompatibilidad con interruptor de tarjeta previa */
+#masterArmorToggle + div:not(.md3-switch-track) {
+  position: relative;
+  width: 3.1rem;
+  height: 1.75rem;
+  background-color: var(--md-sys-color-surface-container-highest);
+  border: 2px solid var(--md-sys-color-outline);
+  border-radius: 9999px;
+  transition: all 0.22s cubic-bezier(0.2, 0, 0, 1);
+}
+
+#masterArmorToggle + div:not(.md3-switch-track)::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  width: 1.15rem;
+  height: 1.15rem;
+  background-color: #CCD0CF;
+  border-radius: 9999px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  transition: transform 0.22s cubic-bezier(0.2, 0, 0, 1), background-color 0.22s ease;
+}
+
+#masterArmorToggle:checked + div:not(.md3-switch-track) {
+  background-color: #253745;
+  border-color: #9BA8AB;
+}
+
+html[data-theme="light"] #masterArmorToggle:checked + div:not(.md3-switch-track) {
+  background-color: #11212D;
+  border-color: #06141B;
+}
+
+#masterArmorToggle:checked + div:not(.md3-switch-track)::after {
+  transform: translateX(1.3rem);
+  background-color: #34D399;
+}
+
+/* Píldora de Paleta Oficial (6 Tonos de Referencia) */
+.md3-palette-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  background-color: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.md3-swatch {
+  width: 12px;
+  height: 18px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: transform 0.15s ease;
+}
+.md3-swatch:hover {
+  transform: scale(1.25);
+}
+
+/* Botón Segmentado de Tema M3 */
+.md3-theme-segmented {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: 9999px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.md3-theme-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--md-sys-color-on-surface-variant);
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.md3-theme-btn.active {
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  box-shadow: var(--md-elevation-1);
+}
+
+html[data-theme="light"] .md3-theme-btn.active {
+  background-color: #11212D;
+  color: #CCD0CF;
+}
+
+/* ============================================================================
+   2. Material Design 3 Tabs Navigation Bar & Tab Panels
+   ============================================================================ */
+.md3-tabs-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0 1rem;
+  background-color: var(--md-sys-color-surface-container-low);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  box-shadow: var(--md-elevation-1);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  flex-shrink: 0;
+  transition: background-color 0.25s cubic-bezier(0.2, 0, 0, 1), border-color 0.25s ease;
+}
+.md3-tabs-bar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Botones de Pestaña */
+.md3-tab,
+.md3-tab-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2.85rem;
+  padding: 0 1.15rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--md-tab-inactive-text);
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+  user-select: none;
+}
+
+.md3-tab:hover,
+.md3-tab-button:hover {
+  color: var(--md-sys-color-on-surface);
+  background-color: var(--md-tab-hover-bg);
+}
+
+.md3-tab.active,
+.md3-tab-button.active {
+  color: var(--md-tab-active-text);
+  border-bottom-color: var(--md-tab-active-indicator);
+  background-color: var(--md-tab-active-bg);
+  font-weight: 700;
+}
+
+html[data-theme="light"] .md3-tab.active,
+html[data-theme="light"] .md3-tab-button.active {
+  color: #06141B;
+  border-bottom-color: #11212D;
+  background-color: rgba(37, 55, 69, 0.12);
+}
+
+.md3-tab i,
+.md3-tab-button i {
+  font-size: 0.95em;
+}
+
+/* Distintivo Numérico en Pestaña */
+.md3-tab-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.45rem;
+  border-radius: 9999px;
+  font-size: 0.65rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* Paneles de Contenido por Pestaña */
+.md3-tab-panel,
+.md3-tab-content {
+  display: none;
+  flex: 1 1 0%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.md3-tab-panel.active,
+.md3-tab-content.active {
+  display: flex;
+  flex-direction: column;
+  animation: tabFadeIn 0.22s cubic-bezier(0.2, 0, 0, 1) forwards;
+}
+
+@keyframes tabFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================================
+   3. Material Design 3 Floating Dropdown Menus
+   ============================================================================ */
+.md3-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.md3-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 270px;
+  background-color: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: 14px;
+  box-shadow: var(--md-elevation-3);
+  padding: 0.45rem;
+  z-index: 50;
+  display: none;
+}
+
+.md3-dropdown-menu.show,
+.md3-dropdown.open .md3-dropdown-menu {
+  display: block;
+  animation: fadeInSlide 0.18s cubic-bezier(0.2, 0, 0, 1) forwards;
+}
+
+.md3-dropdown-section-title {
+  padding: 0.4rem 0.65rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--md-sys-color-on-surface-variant);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  margin-bottom: 0.25rem;
+}
+
+.md3-dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--md-sys-color-on-surface);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.md3-dropdown-item:hover {
+  background-color: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface-strong);
+}
+
+/* ============================================================================
+   4. Material Design 3 Cards, Buttons & Inputs
+   ============================================================================ */
+.md3-card {
+  background-color: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 20px;
+  padding: 1.25rem;
+  box-shadow: var(--md-elevation-1);
+  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.2s ease;
+}
+
+.md3-card-elevated {
+  background-color: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 16px;
+}
+
+/* M3 Status Chip in Top Bar */
+.md3-status-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  background-color: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+/* M3 Assist Chips (Pruebas Rápidas de Ataque) */
+.md3-assist-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.38rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 500;
+  background-color: var(--md-sys-color-surface-container-low);
+  color: var(--md-sys-color-on-surface);
+  border: 1px solid var(--md-sys-color-outline);
+  white-space: nowrap;
+  box-shadow: var(--md-elevation-1);
+  transition: all 0.18s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.md3-assist-chip:hover {
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  border-color: var(--md-sys-color-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--md-elevation-2);
+}
+
+/* M3 Primary Filled Button (Enviar) */
+.md3-btn-filled {
+  height: 2.85rem;
+  padding: 0 1.35rem;
+  border-radius: 9999px;
+  background-color: #253745;
+  color: #CCD0CF;
+  border: 1px solid #4A5C6A;
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: var(--md-elevation-1);
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.md3-btn-filled:hover:not(:disabled) {
+  background-color: #4A5C6A;
+  color: #FFFFFF;
+  box-shadow: var(--md-elevation-2);
+  transform: translateY(-1px);
+}
+
+html[data-theme="light"] .md3-btn-filled {
+  background-color: #11212D;
+  color: #CCD0CF;
+  border-color: #06141B;
+}
+
+html[data-theme="light"] .md3-btn-filled:hover:not(:disabled) {
+  background-color: #253745;
+  color: #FFFFFF;
+}
+
+/* M3 Outlined / Tonal Button */
+.md3-btn-tonal {
+  padding: 0.4rem 0.85rem;
+  border-radius: 9999px;
+  background-color: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-primary-container);
+  border: 1px solid var(--md-sys-color-outline);
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+html[data-theme="light"] .md3-btn-tonal {
+  background-color: var(--md-sys-color-surface-container-low);
+  color: var(--md-sys-color-on-surface);
+}
+
+.md3-btn-tonal:hover {
+  background-color: #4A5C6A;
+  color: #CCD0CF;
+}
+
+/* M3 Text Field / Composer */
+.md3-input-field {
+  width: 100%;
+  background-color: var(--md-sys-color-surface-container-lowest);
+  color: var(--md-sys-color-on-surface);
+  border: 1.5px solid var(--md-sys-color-outline);
+  border-radius: 20px;
+  padding: 0.7rem 1.1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.md3-input-field::placeholder {
+  color: var(--md-sys-color-on-surface-muted);
+}
+
+.md3-input-field:focus {
+  outline: none;
+  border-color: var(--md-sys-color-primary);
+  box-shadow: 0 0 0 3px rgba(74, 92, 106, 0.28);
+}
+
+/* M3 Select Field */
+.md3-select {
+  width: 100%;
+  background-color: var(--md-sys-color-surface-container-lowest);
+  color: var(--md-sys-color-on-surface);
+  border: 1.5px solid var(--md-sys-color-outline);
+  border-radius: 14px;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.75rem;
+  transition: border-color 0.2s ease;
+}
+
+.md3-select:focus {
+  outline: none;
+  border-color: var(--md-sys-color-primary);
+}
+
+/* ============================================================================
+   5. Chat Bubbles & Avatars (Theme Adaptive)
+   ============================================================================ */
+.md3-bubble-user {
+  background-color: var(--md-user-bubble-bg);
+  color: var(--md-user-bubble-text);
+  border: 1px solid var(--md-user-bubble-border);
+  border-radius: 22px 22px 6px 22px;
+  padding: 0.85rem 1.1rem;
+  box-shadow: var(--md-elevation-1);
+}
+
+.md3-bubble-user p,
+.md3-bubble-user span {
+  color: inherit;
+}
+
+.md3-bubble-bot {
+  background-color: var(--md-bot-bubble-bg);
+  color: var(--md-bot-bubble-text);
+  border: 1px solid var(--md-bot-bubble-border);
+  border-radius: 22px 22px 22px 6px;
+  padding: 0.85rem 1.1rem;
+  box-shadow: var(--md-elevation-1);
+}
+
+.md3-bubble-blocked {
+  background-color: var(--md-status-error-bg);
+  color: var(--md-sys-color-on-surface);
+  border: 1.5px solid var(--md-status-error-border);
+  border-radius: 22px 22px 22px 6px;
+  padding: 0.85rem 1.1rem;
+  box-shadow: var(--md-elevation-2);
+}
+
+.md3-avatar-bot {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 14px;
+  background-color: #253745;
+  color: #CCD0CF;
+  border: 1px solid #4A5C6A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: var(--md-elevation-1);
+}
+
+.md3-avatar-user {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 14px;
+  background-color: #4A5C6A;
+  color: #CCD0CF;
+  border: 1px solid #9BA8AB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: var(--md-elevation-1);
+}
+
+.md3-avatar-blocked {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 14px;
+  background-color: #991B1B;
+  color: #FEE2E2;
+  border: 1px solid #F87171;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: var(--md-elevation-1);
+}
+
+/* ============================================================================
+   6. Material Design 3 Expandable Dropdown for Real Model Response (Allowed Prompts)
+   ============================================================================ */
+.max-h-72 { max-height: 20rem; }
+
+.md3-response-dropdown {
+  margin-top: 0.65rem;
+  background-color: var(--md-sys-color-surface-container-lowest);
+  border: 1.5px solid var(--md-status-safe-border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--md-elevation-1);
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.md3-response-dropdown summary {
+  cursor: pointer;
+  user-select: none;
+  padding: 0.65rem 0.95rem;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--md-status-safe-text);
+  background-color: var(--md-status-safe-bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  list-style: none;
+  transition: background-color 0.18s ease;
+}
+
+.md3-response-dropdown summary::-webkit-details-marker {
+  display: none;
+}
+
+.md3-response-dropdown summary::after {
+  content: "▾";
+  font-size: 13px;
+  font-weight: bold;
+  transition: transform 0.22s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.md3-response-dropdown[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.md3-response-dropdown summary:hover {
+  filter: brightness(1.1);
+}
+
+.md3-response-dropdown-body {
+  padding: 0.85rem 1rem;
+  background-color: var(--md-sys-color-surface-container-lowest);
+  color: var(--md-sys-color-on-surface);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+  font-size: 11px;
+}
+
+.md3-real-response-box {
+  background-color: var(--md-sys-color-surface-container-low);
+  border-left: 4px solid var(--md-status-safe-text);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+  border-right: 1px solid var(--md-sys-color-outline-variant);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 0 12px 12px 0;
+  padding: 0.75rem 0.95rem;
+  color: var(--md-sys-color-on-surface-strong);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  max-height: 14rem;
+  overflow-y: auto;
+}
+
+/* Grilla de Telemetría Responsiva */
+.md3-telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.md3-telemetry-item {
+  background-color: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 10px;
+  padding: 0.45rem 0.65rem;
+  font-size: 10.5px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.md3-telemetry-label {
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 9.5px;
+  display: block;
+  margin-bottom: 0.15rem;
+  text-transform: uppercase;
+}
+
+.md3-telemetry-value {
+  color: var(--md-sys-color-on-surface-strong);
+  font-weight: 600;
+}
+
+/* ============================================================================
+   7. Cloud Logging Viewer, Políticas & Detectores
+   ============================================================================ */
+.logs-scroll-area {
+  max-height: 24rem;
+  overflow-y: auto;
+}
+
+.cmd-box {
+  background-color: var(--md-code-bg);
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: 12px;
+  padding: 0.55rem 0.75rem;
+  font-size: 10.5px;
+  line-height: 1.45;
+  color: var(--md-code-text);
+  word-break: break-all;
+}
+
+.log-card {
+  background-color: var(--md-sys-color-surface-container-lowest);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 16px;
+  padding: 0.8rem 0.95rem;
+  box-shadow: var(--md-elevation-1);
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.log-card-blocked {
+  background-color: var(--md-status-error-bg);
+  border: 1.5px solid var(--md-status-error-border);
+}
+
+.log-card details summary {
+  cursor: pointer;
+  user-select: none;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--md-sys-color-on-surface-variant);
+  margin-top: 0.4rem;
+  outline: none;
+}
+
+.log-card details summary:hover {
+  color: var(--md-sys-color-on-surface-strong);
+}
+
+.log-json-pre {
+  background-color: var(--md-code-bg);
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: 12px;
+  padding: 0.6rem;
+  margin-top: 0.4rem;
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--md-code-text);
+  max-height: 15rem;
+  overflow: auto;
+  white-space: pre;
+}
+
+.btn-action-secondary {
+  background-color: var(--md-sys-color-surface-container-high);
+  border: 1px solid var(--md-sys-color-outline);
+  color: #CCD0CF;
+  border-radius: 9999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 11px;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+html[data-theme="light"] .btn-action-secondary {
+  background-color: #253745;
+  color: #CCD0CF;
+}
+
+.btn-action-secondary:hover {
+  background-color: #4A5C6A;
+  color: #FFFFFF;
+}
+
+.btn-console-link {
+  background-color: #11212D;
+  border: 1px solid #4A5C6A;
+  color: #CCD0CF;
+  border-radius: 9999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.btn-console-link:hover {
+  background-color: #253745;
+  color: #FFFFFF;
+}
+
+.policy-rule-card {
+  background-color: var(--md-sys-color-surface-container-lowest);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 16px;
+  padding: 0.85rem 1rem;
+  box-shadow: var(--md-elevation-1);
+  transition: all 0.22s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.policy-rule-card-triggered {
+  background-color: var(--md-status-error-bg);
+  border: 1.5px solid var(--md-status-error-border);
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.2);
+}
+
+.detector-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background-color: #253745;
+  border: 1px solid #4A5C6A;
+  color: #CCD0CF;
+  border-radius: 9999px;
+  padding: 0.18rem 0.55rem;
+  font-size: 10px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+.detector-chip-triggered {
+  background-color: #991B1B;
+  border-color: #F87171;
+  color: #FEE2E2;
+  font-weight: 700;
+}
+
+.detector-row {
+  background-color: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 12px;
+  padding: 0.45rem 0.65rem;
+}
+
+.detector-row-triggered {
+  background-color: var(--md-status-error-bg);
+  border: 1.5px solid var(--md-status-error-border);
+}
+
+/* ============================================================================
+   8. Theme-Adaptive Utility Classes
+   ============================================================================ */
+.bg-slate-900 { background-color: var(--md-sys-color-background); }
+.bg-slate-900\/50,
+.bg-slate-900\/60,
+.bg-slate-900\/70,
+.bg-slate-900\/75,
+.bg-slate-900\/80,
+.bg-slate-900\/90 {
+  background-color: var(--md-sys-color-surface-container-lowest);
+}
+.bg-slate-950\/70 {
+  background-color: var(--md-code-bg);
+  color: var(--md-code-text);
+}
+.bg-slate-850 { background-color: var(--md-sys-color-surface); }
+.bg-slate-800,
+.bg-slate-800\/60,
+.bg-slate-800\/80,
+.bg-slate-800\/90 {
+  background-color: var(--md-sys-color-surface-container-low);
+}
+.bg-slate-700,
+.bg-slate-700\/50,
+.bg-slate-700\/80 {
+  background-color: var(--md-sys-color-surface-container-high);
+}
+.bg-blue-600 { background-color: #253745; }
+.bg-blue-500\/20 { background-color: rgba(74, 92, 106, 0.25); }
+.bg-emerald-600 { background-color: #253745; }
+.bg-emerald-500\/10,
+.bg-emerald-500\/15,
+.bg-emerald-900\/60 {
+  background-color: var(--md-status-safe-bg);
+}
+.bg-indigo-500\/10,
+.bg-indigo-500\/15,
+.bg-indigo-500\/20 {
+  background-color: rgba(74, 92, 106, 0.22);
+}
+.bg-amber-500\/15 {
+  background-color: var(--md-status-warn-bg);
+}
+.bg-rose-500\/15,
+.bg-red-500\/10,
+.bg-red-500\/15,
+.bg-red-900\/60,
+.bg-red-900\/70,
+.bg-red-950\/30,
+.bg-red-950\/40,
+.bg-red-950\/50,
+.bg-red-950\/60 {
+  background-color: var(--md-status-error-bg);
+}
+.bg-purple-500\/15,
+.bg-cyan-500\/15 {
+  background-color: rgba(74, 92, 106, 0.22);
+}
+
+/* Colores de Texto Adaptables */
+.text-white { color: var(--md-sys-color-on-surface-strong); }
+.text-slate-100,
+.text-slate-200 { color: var(--md-sys-color-on-surface); }
+.text-slate-300 { color: var(--md-sys-color-on-surface-variant); }
+.text-slate-400 { color: var(--md-sys-color-on-surface-muted); }
+
+.text-blue-100,
+.text-blue-200 { color: var(--md-user-bubble-meta); }
+.text-blue-300,
+.text-blue-400,
+.text-indigo-300,
+.text-indigo-400,
+.text-cyan-300,
+.text-cyan-400,
+.text-purple-300,
+.text-purple-400 {
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+html[data-theme="dark"] .text-blue-300,
+html[data-theme="dark"] .text-blue-400,
+html[data-theme="dark"] .text-indigo-300,
+html[data-theme="dark"] .text-indigo-400 {
+  color: #9BA8AB;
+}
+
+html[data-theme="light"] .text-blue-300,
+html[data-theme="light"] .text-blue-400,
+html[data-theme="light"] .text-indigo-300,
+html[data-theme="light"] .text-indigo-400 {
+  color: #253745;
+}
+
+.text-emerald-300,
+.text-emerald-400 { color: var(--md-status-safe-text); }
+
+.text-amber-200,
+.text-amber-200\/90,
+.text-amber-300,
+.text-amber-300\/90,
+.text-amber-400 { color: var(--md-status-warn-text); }
+
+.text-red-100,
+.text-red-200,
+.text-red-300,
+.text-rose-300,
+.text-rose-300\/90 { color: var(--md-status-error-text); }
+
+.text-red-400,
+.text-rose-400 { color: var(--md-status-error-strong); }
+
+/* Bordes */
+.border { border-width: 1px; }
+.border-b { border-bottom-width: 1px; }
+.border-t { border-top-width: 1px; }
+.border-r { border-right-width: 1px; }
+.border-slate-600,
+.border-slate-700,
+.border-slate-700\/40,
+.border-slate-700\/50,
+.border-slate-700\/60,
+.border-slate-700\/70,
+.border-slate-700\/80,
+.border-slate-800 {
+  border-color: var(--md-sys-color-outline-variant);
+}
+.border-emerald-500\/20,
+.border-emerald-500\/30,
+.border-emerald-700,
+.border-emerald-800\/40 {
+  border-color: var(--md-status-safe-border);
+}
+.border-amber-500\/30,
+.border-amber-600\/50,
+.border-amber-700\/40,
+.border-amber-800\/40 {
+  border-color: var(--md-status-warn-border);
+}
+.border-red-500,
+.border-red-500\/20,
+.border-red-500\/30,
+.border-rose-500\/30,
+.border-red-700,
+.border-red-700\/60,
+.border-red-800\/30,
+.border-red-800\/40 {
+  border-color: var(--md-status-error-border);
+}
+.border-indigo-500\/20,
+.border-indigo-500\/30,
+.border-blue-500\/30,
+.border-purple-500\/30,
+.border-cyan-500\/30 {
+  border-color: var(--md-sys-color-outline);
+}
+
+/* ============================================================================
+   9. Layout, Spacing & Sizing Utilities
+   ============================================================================ */
 .h-full { height: 100%; }
 .w-full { width: 100%; }
 .flex { display: flex; }
@@ -64,6 +1273,7 @@ code, pre, .font-mono {
 .hidden { display: none; }
 .flex-1 { flex: 1 1 0%; }
 .flex-col { flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
 .shrink-0 { flex-shrink: 0; }
 .items-center { align-items: center; }
 .items-start { align-items: flex-start; }
@@ -77,12 +1287,19 @@ code, pre, .font-mono {
 .overflow-x-auto { overflow-x: auto; }
 .whitespace-nowrap { white-space: nowrap; }
 .whitespace-pre-wrap { white-space: pre-wrap; }
+.break-all { word-break: break-all; }
 .resize-none { resize: none; }
 .cursor-pointer { cursor: pointer; }
+.text-center { text-align: center; }
 
-/* Sizing */
-.w-1\.5 { width: 0.375rem; }
-.h-1\.5 { height: 0.375rem; }
+.grid { display: grid; }
+.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+.w-3 { width: 0.75rem; }
+.h-3 { height: 0.75rem; }
+.w-4 { width: 1rem; }
+.h-4 { height: 1rem; }
 .w-8 { width: 2rem; }
 .h-8 { height: 2rem; }
 .w-10 { width: 2.5rem; }
@@ -93,27 +1310,36 @@ code, pre, .font-mono {
 .max-w-xl { max-width: 36rem; }
 .max-w-2xl { max-width: 42rem; }
 .max-w-3xl { max-width: 48rem; }
+.max-w-4xl { max-width: 56rem; }
 .max-h-28 { max-height: 7rem; }
+.max-h-\[370px\] { max-height: 370px; }
 
-/* Spacing & Gaps */
 .gap-1 { gap: 0.25rem; }
 .gap-1\.5 { gap: 0.375rem; }
 .gap-2 { gap: 0.5rem; }
+.gap-2\.5 { gap: 0.625rem; }
 .gap-3 { gap: 0.75rem; }
 .gap-4 { gap: 1rem; }
 
 .space-x-3 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.75rem; }
-.space-x-4 > :not([hidden]) ~ :not([hidden]) { margin-left: 1rem; }
+.space-y-0\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.125rem; }
 .space-y-1 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.25rem; }
+.space-y-1\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.375rem; }
 .space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
+.space-y-2\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.625rem; }
 .space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.75rem; }
 .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
-.space-y-5 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.25rem; }
 
 .p-1\.5 { padding: 0.375rem; }
 .p-2 { padding: 0.5rem; }
+.p-2\.5 { padding: 0.625rem; }
+.p-3 { padding: 0.75rem; }
+.p-3\.5 { padding: 0.875rem; }
 .p-4 { padding: 1rem; }
 .p-5 { padding: 1.25rem; }
+.p-6 { padding: 1.5rem; }
+.px-1 { padding-left: 0.25rem; padding-right: 0.25rem; }
+.px-1\.5 { padding-left: 0.375rem; padding-right: 0.375rem; }
 .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
 .px-2\.5 { padding-left: 0.625rem; padding-right: 0.625rem; }
 .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
@@ -126,146 +1352,60 @@ code, pre, .font-mono {
 .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
 .py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
 .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+.pt-0\.5 { padding-top: 0.125rem; }
+.pt-2 { padding-top: 0.5rem; }
+.pb-1 { padding-bottom: 0.25rem; }
 .pb-1\.5 { padding-bottom: 0.375rem; }
+.pb-2 { padding-bottom: 0.5rem; }
+.pb-3 { padding-bottom: 0.75rem; }
+.pr-0\.5 { padding-right: 0.125rem; }
 
 .mr-2 { margin-right: 0.5rem; }
+.mb-0\.5 { margin-bottom: 0.125rem; }
 .mb-1 { margin-bottom: 0.25rem; }
 .mb-1\.5 { margin-bottom: 0.375rem; }
 .mb-2 { margin-bottom: 0.5rem; }
 .mt-0\.5 { margin-top: 0.125rem; }
+.mt-1 { margin-top: 0.25rem; }
+.mt-1\.5 { margin-top: 0.375rem; }
+.mt-2 { margin-top: 0.5rem; }
 .mt-3 { margin-top: 0.75rem; }
 
-/* Typography */
-.text-\[10px\] { font-size: 10px; line-height: 14px; }
-.text-\[11px\] { font-size: 11px; line-height: 15px; }
-.text-xs { font-size: 0.75rem; line-height: 1rem; }
-.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+.text-\[9px\] { font-size: 9.5px; line-height: 13px; }
+.text-\[10px\] { font-size: 10.5px; line-height: 14px; }
+.text-\[11px\] { font-size: 11.5px; line-height: 15.5px; }
+.text-xs { font-size: 0.75rem; line-height: 1.05rem; }
+.text-sm { font-size: 0.875rem; line-height: 1.3rem; }
+.text-base { font-size: 1rem; line-height: 1.5rem; }
+.text-lg { font-size: 1.125rem; line-height: 1.65rem; }
 .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
 .font-normal { font-weight: 400; }
 .font-medium { font-weight: 500; }
 .font-semibold { font-weight: 600; }
 .font-bold { font-weight: 700; }
 .uppercase { text-transform: uppercase; }
-.tracking-tight { letter-spacing: -0.025em; }
-.tracking-wider { letter-spacing: 0.05em; }
-.leading-relaxed { line-height: 1.625; }
-.leading-snug { line-height: 1.375; }
+.tracking-tight { letter-spacing: -0.02em; }
+.tracking-wider { letter-spacing: 0.04em; }
+.leading-relaxed { line-height: 1.6; }
+.leading-snug { line-height: 1.38; }
+.leading-tight { line-height: 1.25; }
 
-/* Backgrounds */
-.bg-slate-900 { background-color: #0f172a; }
-.bg-slate-900\/50 { background-color: rgba(15, 23, 42, 0.5); }
-.bg-slate-850 { background-color: #131c31; }
-.bg-slate-800 { background-color: #1e293b; }
-.bg-slate-800\/60 { background-color: rgba(30, 41, 59, 0.6); }
-.bg-slate-800\/80 { background-color: rgba(30, 41, 59, 0.8); }
-.bg-slate-800\/90 { background-color: rgba(30, 41, 59, 0.9); }
-.bg-slate-700 { background-color: #334155; }
-.bg-slate-700\/50 { background-color: rgba(51, 65, 85, 0.5); }
-.bg-slate-700\/80 { background-color: rgba(51, 65, 85, 0.8); }
-.bg-blue-600 { background-color: #2563eb; }
-.bg-blue-500\/20 { background-color: rgba(59, 130, 246, 0.2); }
-.bg-emerald-600 { background-color: #059669; }
-.bg-emerald-400 { background-color: #34d399; }
-.bg-emerald-500\/10 { background-color: rgba(16, 185, 129, 0.1); }
-.bg-emerald-900\/60 { background-color: rgba(6, 78, 59, 0.6); }
-.bg-indigo-500\/10 { background-color: rgba(99, 102, 241, 0.1); }
-.bg-red-600 { background-color: #dc2626; }
-.bg-red-500\/10 { background-color: rgba(239, 68, 68, 0.1); }
-.bg-red-900\/60 { background-color: rgba(127, 29, 29, 0.6); }
-.bg-red-950\/30 { background-color: rgba(69, 10, 10, 0.3); }
-.bg-red-950\/40 { background-color: rgba(69, 10, 10, 0.45); }
-.bg-amber-600 { background-color: #d97706; }
-
-/* Gradients */
-.bg-gradient-to-tr {
-  background-image: linear-gradient(to top right, #2563eb, #4f46e5, #10b981);
-}
-.bg-gradient-to-r {
-  background-image: linear-gradient(to right, #2563eb, #4f46e5);
-}
-.bg-gradient-to-r:hover {
-  background-image: linear-gradient(to right, #3b82f6, #6366f1);
-}
-
-/* Text Colors */
-.text-white { color: #ffffff; }
-.text-slate-100 { color: #f1f5f9; }
-.text-slate-200 { color: #e2e8f0; }
-.text-slate-300 { color: #cbd5e1; }
-.text-slate-400 { color: #94a3b8; }
-.text-blue-100 { color: #dbeafe; }
-.text-blue-200 { color: #bfdbfe; }
-.text-blue-400 { color: #60a5fa; }
-.text-emerald-300 { color: #6ee7b7; }
-.text-emerald-400 { color: #34d399; }
-.text-amber-200 { color: #fde68a; }
-.text-amber-300 { color: #fcd34d; }
-.text-amber-400 { color: #fbbf24; }
-.text-red-100 { color: #fee2e2; }
-.text-red-300 { color: #fca5a5; }
-.text-red-400 { color: #f87171; }
-.text-purple-300 { color: #d8b4fe; }
-.text-purple-400 { color: #c084fc; }
-.text-indigo-300 { color: #a5b4fc; }
-.text-indigo-400 { color: #818cf8; }
-.text-cyan-400 { color: #22d3ee; }
-
-.placeholder-slate-500::placeholder { color: #64748b; }
-
-/* Borders & Radius */
-.border { border-width: 1px; }
-.border-b { border-bottom-width: 1px; }
-.border-t { border-top-width: 1px; }
-.border-r { border-right-width: 1px; }
-.border-slate-600 { border-color: #475569; }
-.border-slate-700 { border-color: #334155; }
-.border-slate-700\/40 { border-color: rgba(51, 65, 85, 0.4); }
-.border-slate-700\/60 { border-color: rgba(51, 65, 85, 0.6); }
-.border-slate-700\/80 { border-color: rgba(51, 65, 85, 0.8); }
-.border-slate-800 { border-color: #1e293b; }
-.border-blue-500\/30 { border-color: rgba(59, 130, 246, 0.3); }
-.border-emerald-500\/20 { border-color: rgba(16, 185, 129, 0.2); }
-.border-emerald-700 { border-color: #047857; }
-.border-emerald-800\/40 { border-color: rgba(6, 95, 70, 0.4); }
-.border-indigo-500\/20 { border-color: rgba(99, 102, 241, 0.2); }
-.border-red-500\/20 { border-color: rgba(239, 68, 68, 0.2); }
-.border-red-700 { border-color: #b91c1c; }
-.border-red-700\/60 { border-color: rgba(185, 28, 28, 0.6); }
-.border-red-800\/30 { border-color: rgba(153, 27, 27, 0.3); }
-.border-red-800\/40 { border-color: rgba(153, 27, 27, 0.4); }
-.border-amber-600\/50 { border-color: rgba(217, 119, 6, 0.5); }
-.border-amber-800\/40 { border-color: rgba(146, 64, 14, 0.4); }
-.border-purple-800\/40 { border-color: rgba(107, 33, 168, 0.4); }
-
-.rounded { border-radius: 0.25rem; }
-.rounded-lg { border-radius: 0.5rem; }
-.rounded-xl { border-radius: 0.75rem; }
-.rounded-2xl { border-radius: 1rem; }
+.rounded { border-radius: 0.375rem; }
+.rounded-md { border-radius: 0.375rem; }
+.rounded-lg { border-radius: 0.75rem; }
+.rounded-xl { border-radius: 1rem; }
+.rounded-2xl { border-radius: 1.25rem; }
 .rounded-full { border-radius: 9999px; }
-.rounded-tl-sm { border-top-left-radius: 0.125rem; }
-.rounded-tr-sm { border-top-right-radius: 0.125rem; }
+.rounded-tl-sm { border-top-left-radius: 0.25rem; }
+.rounded-tr-sm { border-top-right-radius: 0.25rem; }
 
-/* Shadows & Effects */
-.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.25); }
-.shadow { box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.3); }
-.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.35); }
-.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4); }
-.backdrop-blur { backdrop-filter: blur(8px); }
-.transition { transition: all 0.15s ease-in-out; }
-
-/* Hover & Focus States */
-.hover\:bg-slate-600:hover { background-color: #475569; }
-.hover\:bg-red-900\/40:hover { background-color: rgba(127, 29, 29, 0.4); }
-.hover\:bg-amber-900\/40:hover { background-color: rgba(120, 53, 15, 0.4); }
-.hover\:bg-purple-900\/40:hover { background-color: rgba(88, 28, 135, 0.4); }
-.hover\:bg-emerald-900\/40:hover { background-color: rgba(6, 78, 59, 0.4); }
-.focus\:outline-none:focus { outline: none; }
-.focus\:ring-2:focus { box-shadow: 0 0 0 2px #3b82f6; }
+.shadow-sm { box-shadow: var(--md-elevation-1); }
+.shadow, .shadow-md { box-shadow: var(--md-elevation-1); }
+.shadow-lg { box-shadow: var(--md-elevation-2); }
+.transition { transition: all 0.2s cubic-bezier(0.2, 0, 0, 1); }
 .disabled\:opacity-50:disabled { opacity: 0.5; }
 .disabled\:cursor-not-allowed:disabled { cursor: not-allowed; }
 
-/* Toggle Switch (Model Armor Master Switch) */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -278,63 +1418,38 @@ code, pre, .font-mono {
   border-width: 0;
 }
 
-#masterArmorToggle + div {
-  position: relative;
-  width: 2.75rem;
-  height: 1.5rem;
-  background-color: #334155;
-  border-radius: 9999px;
-  transition: background-color 0.2s ease-in-out;
-}
-
-#masterArmorToggle + div::after {
-  content: '';
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 1.25rem;
-  height: 1.25rem;
-  background-color: #ffffff;
-  border-radius: 9999px;
-  transition: transform 0.2s ease-in-out;
-}
-
-#masterArmorToggle:checked + div {
-  background-color: #10b981;
-}
-
-#masterArmorToggle:checked + div::after {
-  transform: translateX(1.25rem);
-}
-
-/* Prose / Markdown Content Styling */
-.prose p { margin-bottom: 0.5rem; }
+/* ============================================================================
+   10. Prose / Markdown Content Styling
+   ============================================================================ */
+.prose p { margin-bottom: 0.45rem; }
 .prose p:last-child { margin-bottom: 0; }
 .prose ul, .prose ol { margin: 0.4rem 0; padding-left: 1.25rem; }
 .prose li { margin-bottom: 0.25rem; }
-.prose strong { font-weight: 700; color: #ffffff; }
+.prose strong { font-weight: 700; color: var(--md-sys-color-on-surface-strong); }
 .prose code {
-  background-color: rgba(15, 23, 42, 0.65);
-  padding: 0.125rem 0.35rem;
-  border-radius: 0.25rem;
-  font-size: 0.8em;
-  color: #fde68a;
+  background-color: var(--md-code-bg);
+  color: var(--md-code-text);
+  padding: 0.14rem 0.4rem;
+  border-radius: 0.35rem;
+  font-size: 0.82em;
+  border: 1px solid var(--md-sys-color-outline-variant);
 }
 .prose pre {
-  background-color: rgba(15, 23, 42, 0.85);
+  background-color: var(--md-code-bg);
+  color: var(--md-code-text);
   padding: 0.75rem;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   overflow-x: auto;
   margin: 0.5rem 0;
 }
 
-/* Animations */
+/* Animaciones */
 @keyframes fadeInSlide {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .chat-bubble-enter {
-  animation: fadeInSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeInSlide 0.25s cubic-bezier(0.2, 0, 0, 1) forwards;
 }
 
 @keyframes pulse {
@@ -349,7 +1464,7 @@ code, pre, .font-mono {
 }
 .fa-spin { display: inline-block; animation: spin 1s linear infinite; }
 
-/* Self-contained Icons (No FontAwesome CDN needed) */
+/* Iconos de Seguridad y Material */
 i.fa-solid {
   font-style: normal;
   display: inline-flex;
@@ -359,6 +1474,7 @@ i.fa-solid {
 }
 .fa-shield-halved::before { content: "🛡️"; }
 .fa-shield-virus::before { content: "🛡️"; }
+.fa-shield::before { content: "🛡️"; }
 .fa-server::before { content: "🟢"; font-size: 0.75em; }
 .fa-network-wired::before { content: "🌐"; }
 .fa-trash-can::before { content: "🗑️"; }
@@ -369,26 +1485,240 @@ i.fa-solid {
 .fa-circle-check::before { content: "✅"; }
 .fa-triangle-exclamation::before { content: "⚠️"; }
 .fa-ban::before { content: "🚫"; }
+.fa-xmark::before { content: "✖"; }
 .fa-brain::before { content: "🧠"; }
 .fa-layer-group::before { content: "📋"; }
-.fa-user-ninja::before { content: "🥷"; }
-.fa-id-card::before { content: "💳"; }
-.fa-biohazard::before { content: "☣️"; }
+.fa-user-secret::before { content: "🥷"; }
+.fa-credit-card::before { content: "💳"; }
+.fa-scale-balanced::before { content: "⚖️"; }
 .fa-link-slash::before { content: "🔗"; }
 .fa-magnifying-glass-chart::before { content: "🔍"; }
 .fa-circle-notch::before { content: "⏳"; }
+.fa-terminal::before { content: "💻"; }
+.fa-rotate::before { content: "🔄"; }
+.fa-copy::before { content: "📋"; }
+.fa-up-right-from-square::before { content: "↗️"; }
+.fa-file-waveform::before { content: "📜"; }
+.fa-sun::before { content: "☀️"; }
+.fa-moon::before { content: "🌙"; }
+.fa-palette::before { content: "🎨"; }
+.fa-comments::before { content: "💬"; }
+.fa-diagram-project::before { content: "🗺️"; }
+.fa-Sitemap::before { content: "🗺️"; }
+.fa-code-branch::before { content: "🌿"; }
+.fa-database::before { content: "🗄️"; }
+.fa-lock::before { content: "🔒"; }
+.fa-eye::before { content: "👁️"; }
+.fa-play::before { content: "▶️"; }
 
-/* Responsive Breakpoints */
+/* ============================================================================
+   11. Interactive Graphical Architecture Diagram (Material Design 3)
+   ============================================================================ */
+.arch-diagram-wrapper {
+  background: radial-gradient(circle at 50% 20%, rgba(37, 55, 69, 0.42) 0%, rgba(6, 20, 27, 0.92) 100%);
+  border: 1.5px solid var(--md-sys-color-outline);
+  border-radius: 20px;
+  padding: 1rem;
+  box-shadow: var(--md-elevation-2);
+  overflow-x: auto;
+  position: relative;
+}
+
+html[data-theme="light"] .arch-diagram-wrapper {
+  background: radial-gradient(circle at 50% 20%, #FFFFFF 0%, #E0E4E3 100%);
+  border-color: #4A5C6A;
+}
+
+.arch-svg {
+  width: 100%;
+  min-width: 920px;
+  height: auto;
+  display: block;
+  user-select: none;
+}
+
+/* Zonas de Capas en el SVG */
+.arch-zone-rect {
+  fill: rgba(17, 33, 45, 0.65);
+  stroke: rgba(155, 168, 171, 0.28);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
+  rx: 16px;
+}
+
+html[data-theme="light"] .arch-zone-rect {
+  fill: rgba(255, 255, 255, 0.72);
+  stroke: rgba(37, 55, 69, 0.35);
+}
+
+.arch-zone-title {
+  fill: #9BA8AB;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+html[data-theme="light"] .arch-zone-title {
+  fill: #253745;
+}
+
+/* Nodos Interactivos del Diagrama */
+.arch-node {
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), opacity 0.25s ease, filter 0.25s ease;
+}
+
+.arch-node:hover .arch-node-box {
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 10px rgba(155, 168, 171, 0.45));
+}
+
+.arch-node.selected .arch-node-box {
+  stroke: #34D399 !important;
+  stroke-width: 2.8 !important;
+  filter: drop-shadow(0 0 12px rgba(52, 211, 153, 0.45));
+}
+
+.arch-node.dimmed {
+  opacity: 0.28;
+}
+
+.arch-node-box {
+  fill: #11212D;
+  stroke: #4A5C6A;
+  stroke-width: 1.8;
+  rx: 14px;
+  transition: all 0.22s ease;
+}
+
+html[data-theme="light"] .arch-node-box {
+  fill: #11212D;
+  stroke: #06141B;
+}
+
+.arch-node-box-armor {
+  fill: #1A1423;
+  stroke: #F59E0B;
+  stroke-width: 2;
+}
+
+.arch-node-box-sdp {
+  fill: #1F1916;
+  stroke: #FBBF24;
+  stroke-width: 1.8;
+}
+
+.arch-node-box-vertex {
+  fill: #0F2429;
+  stroke: #34D399;
+  stroke-width: 2;
+}
+
+.arch-node-title {
+  fill: #FFFFFF;
+  font-size: 12.5px;
+  font-weight: 700;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.arch-node-subtitle {
+  fill: #CCD0CF;
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.arch-node-meta {
+  fill: #9BA8AB;
+  font-size: 9.5px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Líneas de Flujo Animadas */
+@keyframes archFlowDash {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+.arch-edge {
+  fill: none;
+  stroke-width: 2.4;
+  stroke-dasharray: 7 5;
+  animation: archFlowDash 1.1s linear infinite;
+  transition: opacity 0.25s ease, stroke-width 0.25s ease;
+}
+
+.arch-edge.dimmed {
+  opacity: 0.14;
+  animation: none;
+}
+
+.arch-edge.highlighted {
+  stroke-width: 3.4;
+  opacity: 1;
+}
+
+.arch-edge-input { stroke: #38BDF8; }
+.arch-edge-block-in { stroke: #F87171; }
+.arch-edge-vertex { stroke: #34D399; }
+.arch-edge-block-out { stroke: #FB923C; }
+.arch-edge-log { stroke: #A78BFA; }
+
+/* Botones de Selección de Flujo de Arquitectura */
+.arch-flow-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background-color: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-on-surface-variant);
+  border: 1px solid var(--md-sys-color-outline);
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.arch-flow-btn:hover {
+  background-color: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface-strong);
+}
+
+.arch-flow-btn.active {
+  background-color: #253745;
+  color: #FFFFFF;
+  border-color: #34D399;
+  box-shadow: var(--md-elevation-1);
+}
+
+html[data-theme="light"] .arch-flow-btn.active {
+  background-color: #11212D;
+  color: #CCD0CF;
+  border-color: #059669;
+}
+
+/* Breakpoints Responsivos */
 @media (min-width: 640px) {
   .sm\:flex { display: flex; }
+  .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sm\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (min-width: 768px) {
   .md\:flex-row { flex-direction: row; }
   .md\:p-6 { padding: 1.5rem; }
-  .md\:w-96 { width: 24rem; }
+  .md\:w-96 { width: 26rem; }
   .md\:border-t-0 { border-top-width: 0; }
   .md\:border-l { border-left-width: 1px; }
 }
 @media (min-width: 1024px) {
-  .lg\:w-\[440px\] { width: 440px; }
+  .lg\:flex { display: flex; }
+  .lg\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .lg\:w-\[440px\] { width: 520px; }
 }
+@media (min-width: 1280px) {
+  .xl\:flex { display: flex; }
+}
+

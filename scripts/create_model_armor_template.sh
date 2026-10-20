@@ -13,7 +13,7 @@ if [ -z "$PROJECT_ID" ]; then
 fi
 
 echo "🛡️ Obteniendo token de autenticación de GCP..."
-ACCESS_TOKEN=$(gcloud auth print-access-token)
+ACCESS_TOKEN=$(gcloud auth application-default print-access-token 2>/dev/null || gcloud auth print-access-token)
 
 echo "🛡️ Creando Template de Model Armor: '$TEMPLATE_ID' en $LOCATION (Proyecto: $PROJECT_ID)..."
 
@@ -35,7 +35,7 @@ RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST \
       },
       "piAndJailbreakFilterSettings": {
         "filterEnforcement": "ENABLED",
-        "confidenceLevel": "MEDIUM_AND_ABOVE"
+        "confidenceLevel": "LOW_AND_ABOVE"
       },
       "maliciousUriFilterSettings": {
         "filterEnforcement": "ENABLED"

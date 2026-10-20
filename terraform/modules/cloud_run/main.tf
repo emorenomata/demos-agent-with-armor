@@ -18,6 +18,12 @@ resource "google_project_iam_member" "model_armor_user" {
   member  = "serviceAccount:${google_service_account.cloud_run_sa.email}"
 }
 
+resource "google_project_iam_member" "model_armor_admin" {
+  project = var.project_id
+  role    = "roles/modelarmor.admin"
+  member  = "serviceAccount:${google_service_account.cloud_run_sa.email}"
+}
+
 resource "google_project_iam_member" "dlp_user" {
   project = var.project_id
   role    = "roles/dlp.user"
@@ -30,12 +36,18 @@ resource "google_project_iam_member" "log_writer" {
   member  = "serviceAccount:${google_service_account.cloud_run_sa.email}"
 }
 
+resource "google_project_iam_member" "log_viewer" {
+  project = var.project_id
+  role    = "roles/logging.viewer"
+  member  = "serviceAccount:${google_service_account.cloud_run_sa.email}"
+}
+
 # Cloud Run v2 Service
 resource "google_cloud_run_v2_service" "app_service" {
   name     = var.service_name
   location = var.region
   project  = var.project_id
-  ingress  = "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER" # Only accessible via Load Balancer & Cloud Armor
+  ingress  = "INGRESS_TRAFFIC_ALL" # Accessible via Cloud Armor Load Balancer AND direct HTTPS Cloud Run URL for demos
 
   template {
     service_account = google_service_account.cloud_run_sa.email
@@ -65,6 +77,10 @@ resource "google_cloud_run_v2_service" "app_service" {
       env {
         name  = "MODEL_ARMOR_LOCATION"
         value = var.region
+      }
+      env {
+        name  = "AGENT_ENGINE_RESOURCE_NAME"
+        value = var.agent_engine_resource_name
       }
       env {
         name  = "GEMINI_API_KEY"

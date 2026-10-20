@@ -1,0 +1,54 @@
+# ==============================================================================
+# Cloud Build Pipeline to execute Terraform (Cloud Armor + Model Armor + Cloud Run + LB)
+# Ideal for environments without local Terraform CLI (e.g. corporate Macs with Santa)
+# or CI/CD automation. Persists Terraform state in gs://${PROJECT_ID}-agent-staging/terraform/state
+# ==============================================================================
+
+steps:
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim"
+    id: "terraform-apply"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        set -e
+        apt-get update -qq && apt-get install -y -qq unzip curl >/dev/null
+        curl -fsSL https://releases.hashicorp.com/terraform/1.9.8/terraform_1.9.8_linux_amd64.zip -o /tmp/terraform.zip
+        unzip -q /tmp/terraform.zip -d /usr/local/bin
+        chmod +x /usr/local/bin/terraform
+        terraform version
+
+        cd terraform
+        cat > backend_override.tf <<EOF
+        terraform {
+          backend "gcs" {
+            bucket = "${_STATE_BUCKET}"
+            prefix = "terraform/state"
+          }
+        }
+        EOF
+
+        terraform init -reconfigure
+        terraform apply -auto-approve \
+          -var="project_id=${PROJECT_ID}" \
+          -var="region=${_REGION}" \
+          -var="app_name=${_APP_NAME}" \
+          -var="container_image=${_CONTAINER_IMAGE}" \
+          -var="agent_engine_resource_name=${_AGENT_ENGINE_RESOURCE_NAME}" \
+          -var="model_armor_template_id=${_MODEL_ARMOR_TEMPLATE_ID}"
+
+        echo "================ TERRAFORM OUTPUTS ================"
+        terraform output
+        terraform output -json > /workspace/terraform_outputs.json
+        gsutil cp /workspace/terraform_outputs.json "gs://${_STATE_BUCKET}/terraform/outputs.json"
+
+substitutions:
+  _REGION: "us-central1"
+  _APP_NAME: "armor-agent"
+  _STATE_BUCKET: "${PROJECT_ID}-agent-staging"
+  _CONTAINER_IMAGE: "us-central1-docker.pkg.dev/${PROJECT_ID}/armor-agent-repo/armor-agent:latest"
+  _AGENT_ENGINE_RESOURCE_NAME: ""
+  _MODEL_ARMOR_TEMPLATE_ID: "armor-agent-template"
+
+options:
+  logging: CLOUD_LOGGING_ONLY

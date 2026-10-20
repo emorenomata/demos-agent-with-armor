@@ -9,6 +9,9 @@ venv/
 ENV/
 .venv/
 .env
+.agent_engine_id
+.agent_engine_ids.json
+.agents/
 
 # Terraform
 .terraform/

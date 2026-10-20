@@ -12,8 +12,9 @@ WORKDIR /workspace
 COPY app/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application source code
+# Copy application source code and Agent Engine IDs mapping
 COPY app/ /workspace/app/
+COPY .agent_engine_ids.json .agent_engine_id* /workspace/
 
 # Expose port (Cloud Run default: 8080)
 EXPOSE 8080

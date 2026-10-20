@@ -57,3 +57,10 @@ variable "model_armor_template_id" {
   type        = string
   default     = "armor-agent-template"
 }
+
+variable "agent_engine_resource_name" {
+  description = "Vertex AI Agent Engine (Reasoning Engine) resource name (e.g. projects/<NUMBER>/locations/<REGION>/reasoningEngines/<ID>)"
+  type        = string
+  default     = ""
+}
+

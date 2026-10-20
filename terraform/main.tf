@@ -60,12 +60,13 @@ module "model_armor" {
 module "cloud_run" {
   source = "./modules/cloud_run"
 
-  project_id              = var.project_id
-  region                  = var.region
-  service_name            = "${var.app_name}-service"
-  container_image         = var.container_image
-  gemini_api_key          = var.gemini_api_key
-  model_armor_template_id = module.model_armor.template_id
+  project_id                 = var.project_id
+  region                     = var.region
+  service_name               = "${var.app_name}-service"
+  container_image            = var.container_image
+  gemini_api_key             = var.gemini_api_key
+  model_armor_template_id    = module.model_armor.template_id
+  agent_engine_resource_name = var.agent_engine_resource_name
 
   depends_on = [google_project_service.enabled_apis]
 }

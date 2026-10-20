@@ -25,3 +25,9 @@ variable "model_armor_template_id" {
   type    = string
   default = "armor-agent-template"
 }
+
+variable "agent_engine_resource_name" {
+  type    = string
+  default = ""
+}
+

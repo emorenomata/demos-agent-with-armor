@@ -4,8 +4,13 @@ output "load_balancer_ip" {
 }
 
 output "application_url" {
-  description = "Entrypoint URL for the Armor Agent Chat UI"
+  description = "Entrypoint URL for the Armor Agent Chat UI (via Cloud Armor + Global Load Balancer)"
   value       = module.load_balancer.load_balancer_url
+}
+
+output "cloud_run_url" {
+  description = "Direct Cloud Run Service URL"
+  value       = module.cloud_run.service_uri
 }
 
 output "cloud_run_service_name" {
@@ -22,3 +27,9 @@ output "model_armor_template_id" {
   description = "Configured Model Armor Template ID"
   value       = module.model_armor.template_id
 }
+
+output "agent_engine_resource_name" {
+  description = "Configured Vertex AI Agent Engine Resource Name"
+  value       = var.agent_engine_resource_name
+}
+
