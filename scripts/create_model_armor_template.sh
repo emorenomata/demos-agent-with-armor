@@ -24,6 +24,11 @@ RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST \
   -H "Content-Type: application/json" \
   "${URL}" \
   -d '{
+    "templateMetadata": {
+      "multiLanguageDetection": {
+        "enableMultiLanguageDetection": true
+      }
+    },
     "filterConfig": {
       "raiSettings": {
         "raiFilters": [

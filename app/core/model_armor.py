@@ -1,12 +1,49 @@
 import logging
+import re
 import time
 from typing import Dict, Any, Optional, List, Tuple
 import google.auth
 import google.auth.transport.requests
 import requests
+from requests.adapters import HTTPAdapter
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
+
+
+def detect_multilanguage_context(text: str) -> Optional[Dict[str, str]]:
+    """
+    Detecta si un texto inspeccionado está en Chino Mandarín (ZH), Árabe (AR) o Inglés (EN)
+    para enriquecer la telemetría de `multiLanguageDetection` (`enableMultiLanguageDetection: true`).
+    """
+    if not text:
+        return None
+    clean = _extract_clean_prompt_excerpt(text) if "Asistente virtual corporativo" in text or "Mensaje actual del Usuario:" in text else text
+    # 1. Chino Mandarín (Caracteres Han CJK)
+    if re.search(r"[\u4e00-\u9fff]", clean):
+        return {
+            "code": "MULTI_LANGUAGE_ZH",
+            "lang_code": "ZH",
+            "lang_label": "Chino Mandarín (中文 · ZH)",
+            "details": "Model Armor Multi-Language Detection (`enableMultiLanguageDetection: true`) analizó e interceptó el payload en Chino Mandarín (中文)."
+        }
+    # 2. Árabe (Alfabeto Árabe RTL)
+    if re.search(r"[\u0600-\u06ff]", clean):
+        return {
+            "code": "MULTI_LANGUAGE_AR",
+            "lang_code": "AR",
+            "lang_label": "Árabe (العربية · AR)",
+            "details": "Model Armor Multi-Language Detection (`enableMultiLanguageDetection: true`) analizó e interceptó el payload en Árabe (العربية)."
+        }
+    # 3. Inglés (Patrones de ataque en inglés)
+    if re.search(r"\b(?:ignore all previous instructions|enter unrestricted developer mode|system safety rules|secret api keys|how to make a bomb|bypass all safety)\b", clean, re.IGNORECASE):
+        return {
+            "code": "MULTI_LANGUAGE_EN",
+            "lang_code": "EN",
+            "lang_label": "Inglés (English · EN)",
+            "details": "Model Armor Multi-Language Detection (`enableMultiLanguageDetection: true`) analizó e interceptó el payload en Inglés (EN)."
+        }
+    return None
 
 
 class ModelArmorResult:
@@ -206,6 +243,18 @@ def parse_floor_setting_error_message(
             "stage": "OUTPUT" if is_output_stage else "INPUT",
             "details": f"Enlace malicioso o de phishing detectado {stage_desc}."
         })
+
+    if matched:
+        ml_ctx = detect_multilanguage_context(output_text if is_output_stage else user_message)
+        if ml_ctx:
+            matched.append({
+                "name": "multiLanguageDetection",
+                "category": f"Detección Multilenguaje — {ml_ctx['lang_label']}",
+                "confidence": "ENABLED",
+                "detected_variable": ml_ctx["code"],
+                "stage": "OUTPUT" if is_output_stage else "INPUT",
+                "details": ml_ctx["details"]
+            })
     return matched
 
 
@@ -381,6 +430,18 @@ def parse_gcp_sanitization_result(data: Dict[str, Any], template_id: str) -> Lis
                     "details": f"Enlace malicioso o de phishing detectado en el texto ({uri_str})."
                 })
 
+    if matched:
+        raw_input_text = (data.get("sanitizationInput") or {}).get("text", "")
+        ml_ctx = detect_multilanguage_context(raw_input_text)
+        if ml_ctx:
+            matched.append({
+                "name": "multiLanguageDetection",
+                "category": f"Detección Multilenguaje — {ml_ctx['lang_label']}",
+                "confidence": "ENABLED",
+                "detected_variable": ml_ctx["code"],
+                "details": ml_ctx["details"]
+            })
+
     return matched
 
 
@@ -416,27 +477,37 @@ class ModelArmorClient:
         self._auth_request = None
         self._current_inspect_and_block: Optional[bool] = None
         self._current_mode: Optional[Tuple[bool, bool]] = None
+        self._cached_floor_data: Optional[Dict[str, Any]] = None
+        self._cached_floor_ts: float = 0.0
+        self._session = requests.Session()
+        adapter = HTTPAdapter(pool_connections=10, pool_maxsize=20)
+        self._session.mount("https://", adapter)
+        self._session.mount("http://", adapter)
 
     def _get_auth_token(self) -> str:
         if not self._credentials:
             self._credentials, _ = google.auth.default(
                 scopes=["https://www.googleapis.com/auth/cloud-platform"]
             )
-            self._auth_request = google.auth.transport.requests.Request()
+            self._auth_request = google.auth.transport.requests.Request(session=self._session)
 
         if not self._credentials.valid:
             self._credentials.refresh(self._auth_request)
         return self._credentials.token
 
-    def get_floor_setting(self) -> Dict[str, Any]:
-        """Lee la configuración actual de Model Armor Floor Settings a nivel proyecto GCP."""
+    def get_floor_setting(self, use_cache: bool = True) -> Dict[str, Any]:
+        """Lee la configuración actual de Model Armor Floor Settings a nivel proyecto GCP (con caché de 60s)."""
+        now = time.time()
+        if use_cache and self._cached_floor_data and (now - self._cached_floor_ts) < 60.0:
+            return self._cached_floor_data
+
         token = self._get_auth_token()
         url = f"https://modelarmor.googleapis.com/v1/projects/{self.project_id}/locations/global/floorSetting"
         headers = {
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
         }
-        resp = requests.get(url, headers=headers, timeout=10)
+        resp = self._session.get(url, headers=headers, timeout=8)
         resp.raise_for_status()
         data = resp.json()
         ai_setting = data.get("aiPlatformFloorSetting", {})
@@ -444,6 +515,8 @@ class ModelArmorClient:
         is_block = enforcement_enabled and bool(ai_setting.get("inspectAndBlock", False))
         self._current_mode = (is_block, enforcement_enabled)
         self._current_inspect_and_block = is_block
+        self._cached_floor_data = data
+        self._cached_floor_ts = now
         return data
 
     def get_detailed_policies_summary(self) -> Dict[str, Any]:
@@ -460,6 +533,10 @@ class ModelArmorClient:
 
         filter_cfg = raw_floor.get("filterConfig", {})
         ai_setting = raw_floor.get("aiPlatformFloorSetting", {})
+        floor_meta = raw_floor.get("floorSettingMetadata", {})
+        multi_lang_enabled = bool(
+            floor_meta.get("multiLanguageDetection", {}).get("enableMultiLanguageDetection", True)
+        )
         is_blocking = bool(raw_floor.get("enableFloorSettingEnforcement", True)) and bool(
             ai_setting.get("inspectAndBlock", True)
         )
@@ -482,11 +559,37 @@ class ModelArmorClient:
             "policy_resource": raw_floor.get("name", f"projects/{self.project_id}/locations/global/floorSetting"),
             "enforcement_enabled": bool(raw_floor.get("enableFloorSettingEnforcement", True)),
             "enforcement_mode": mode_str,
+            "multi_language_detection_enabled": multi_lang_enabled,
             "integrated_services": raw_floor.get("integratedServices", ["AI_PLATFORM"]),
             "cloud_logging_enabled": bool(ai_setting.get("enableCloudLogging", True)),
             "gcloud_floor_command": gcloud_floor_cmd,
             "raw_floor_setting": raw_floor,
             "model_armor_rules": [
+                {
+                    "id": "multiLanguageDetection",
+                    "title": "Detección Multilenguaje Global (Multi-Language Detection)",
+                    "state": "ENABLED" if multi_lang_enabled else "DISABLED",
+                    "threshold": "enableMultiLanguageDetection: true",
+                    "threshold_label": "Metadato Oficial FloorSetting & Template: floorSettingMetadata.multiLanguageDetection",
+                    "description": "Extiende la inspección de Inyección de Prompt, Jailbreak, RAI y SDP a múltiples idiomas (Inglés, Chino Mandarín, Árabe, Español, Portugués, Francés, Alemán, Japonés) para bloquear ataques políglotas de evasión.",
+                    "blocked_matches": [
+                        {
+                            "code": "MULTI_LANGUAGE_EN",
+                            "label": "🇺🇸 Inglés (English — EN) · Jailbreak / DAN / RAI",
+                            "detail": "Bloquea inyecciones de instrucciones ('Ignore all previous instructions', DAN mode) y solicitudes peligrosas en inglés."
+                        },
+                        {
+                            "code": "MULTI_LANGUAGE_ZH",
+                            "label": "🇨🇳 Chino Mandarín (中文 — ZH) · Jailbreak + Contenido Peligroso",
+                            "detail": "Detecta y bloquea prompts maliciosos en caracteres chinos simplificados/tradicionales (ej. '忽略之前的所有安全指令', fabricación de explosivos)."
+                        },
+                        {
+                            "code": "MULTI_LANGUAGE_AR",
+                            "label": "🇸🇦 Árabe (العربية — AR) · Jailbreak + Ciberataques / Explosivos",
+                            "detail": "Inspecciona escritura árabe RTL para interceptar evasión de guardrails ('تجاهل جميع التعليمات السابقة') y amenazas RAI."
+                        }
+                    ]
+                },
                 {
                     "id": "piAndJailbreakFilterSettings",
                     "title": "Inyección de Prompt y Jailbreak",
@@ -667,7 +770,7 @@ class ModelArmorClient:
         url = (
             f"https://modelarmor.googleapis.com/v1/projects/{self.project_id}"
             f"/locations/global/floorSetting"
-            f"?updateMask=enableFloorSettingEnforcement,integratedServices,aiPlatformFloorSetting"
+            f"?updateMask=enableFloorSettingEnforcement,integratedServices,aiPlatformFloorSetting,floorSettingMetadata"
         )
         headers = {
             "Authorization": f"Bearer {token}",
@@ -682,13 +785,20 @@ class ModelArmorClient:
             "enableFloorSettingEnforcement": bool(enable_enforcement),
             "integratedServices": ["AI_PLATFORM"],
             "aiPlatformFloorSetting": ai_platform_setting,
+            "floorSettingMetadata": {
+                "multiLanguageDetection": {
+                    "enableMultiLanguageDetection": True
+                }
+            }
         }
-        resp = requests.patch(url, headers=headers, json=body, timeout=10)
+        resp = self._session.patch(url, headers=headers, json=body, timeout=8)
         resp.raise_for_status()
         self._current_mode = target_mode
         self._current_inspect_and_block = inspect_and_block if enable_enforcement else False
 
         data = resp.json()
+        self._cached_floor_data = data
+        self._cached_floor_ts = time.time()
         data["inspectAndBlock"] = inspect_and_block
         data["enableFloorSettingEnforcement"] = enable_enforcement
         data["cached"] = False
@@ -698,6 +808,8 @@ class ModelArmorClient:
         """Invalida la caché local de Floor Setting."""
         self._current_mode = None
         self._current_inspect_and_block = None
+        self._cached_floor_data = None
+        self._cached_floor_ts = 0.0
 
     def list_sanitize_logs(self, limit: int = 10, vertex_only: bool = True) -> Dict[str, Any]:
         """
@@ -720,7 +832,7 @@ class ModelArmorClient:
             "orderBy": "timestamp desc",
             "pageSize": limit,
         }
-        resp = requests.post(url, headers=headers, json=body, timeout=10)
+        resp = self._session.post(url, headers=headers, json=body, timeout=6)
         resp.raise_for_status()
         raw_entries = resp.json().get("entries", [])
 

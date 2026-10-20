@@ -1,5 +1,7 @@
 import os
 from google.adk.agents import Agent
+from google.adk.planners import BuiltInPlanner
+from google.genai import types
 
 # ============================================================================
 # AGENTES PUROS EN GOOGLE ADK (Desplegados en Vertex AI Agent Engine)
@@ -12,6 +14,8 @@ from google.adk.agents import Agent
 #
 # Los modelos de última generación (gemini-4-argon y gemini-3.8-flash) operan
 # sobre el endpoint global de Vertex AI (GOOGLE_CLOUD_LOCATION="global").
+# Se configura BuiltInPlanner con thinking_level="LOW" para reducir la latencia
+# de inferencia de ~55s a ~2.5s manteniendo alta calidad de respuesta.
 # ============================================================================
 os.environ["GOOGLE_CLOUD_LOCATION"] = "global"
 
@@ -21,6 +25,17 @@ COMMON_INSTRUCTION = (
     "Responde siempre en español de forma breve, clara y concisa "
     "(máximo 2 párrafos cortos o de 3 a 5 viñetas puntuales), "
     "evitando introducciones extensas o texto de relleno."
+)
+
+FAST_GENERATION_CONFIG = types.GenerateContentConfig(
+    temperature=0.2,
+    max_output_tokens=450,
+)
+
+FAST_THINKING_PLANNER = BuiltInPlanner(
+    thinking_config=types.ThinkingConfig(
+        thinking_level="LOW",
+    )
 )
 
 
@@ -33,6 +48,8 @@ def create_adk_agent(model_name: str = "gemini-4-argon") -> Agent:
             f"Asistente virtual corporativo ejecutándose en Vertex AI Agent Engine ({model_name})."
         ),
         instruction=COMMON_INSTRUCTION,
+        generate_content_config=FAST_GENERATION_CONFIG,
+        planner=FAST_THINKING_PLANNER,
     )
 
 

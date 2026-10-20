@@ -1,11 +1,14 @@
 import os
+import asyncio
 import logging
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.routes import router as api_router
+from app.core.agent import armor_agent
 
 # Configure logging
 logging.basicConfig(
@@ -14,10 +17,19 @@ logging.basicConfig(
 )
 logger = logging.getLogger("armor-agent")
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Pre-calentar en background clientes de Vertex AI Agent Engine y caché de Floor Settings
+    asyncio.create_task(asyncio.to_thread(armor_agent.warmup))
+    yield
+
+
 app = FastAPI(
     title=settings.PROJECT_NAME,
     description="Demo de IA Chat con Google Cloud Armor + Model Armor + Gemini",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan,
 )
 
 # Enable CORS for flexibility

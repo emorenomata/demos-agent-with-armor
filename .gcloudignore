@@ -1,0 +1,13 @@
+.git/
+.gitignore
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.env
+.agents/
+terraform/.terraform/
+terraform/*.tfstate*
+terraform/*.tfvars
+.DS_Store

@@ -51,14 +51,22 @@ resource "google_cloud_run_v2_service" "app_service" {
 
   template {
     service_account = google_service_account.cloud_run_sa.email
+    timeout         = "120s"
+
+    scaling {
+      min_instance_count = 1
+      max_instance_count = 20
+    }
 
     containers {
       image = var.container_image
 
       resources {
+        cpu_idle          = false
+        startup_cpu_boost = true
         limits = {
-          cpu    = "1"
-          memory = "1Gi"
+          cpu    = "2"
+          memory = "2Gi"
         }
       }
 

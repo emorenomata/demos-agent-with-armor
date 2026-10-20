@@ -41,13 +41,18 @@ resource "terraform_data" "model_armor_template" {
         curl -s -X PATCH \
           -H "Authorization: Bearer $ACCESS_TOKEN" \
           -H "Content-Type: application/json" \
-          "https://modelarmor.googleapis.com/v1/projects/${var.project_id}/locations/global/floorSetting?updateMask=filterConfig,enableFloorSettingEnforcement,integratedServices,aiPlatformFloorSetting" \
+          "https://modelarmor.googleapis.com/v1/projects/${var.project_id}/locations/global/floorSetting?updateMask=filterConfig,enableFloorSettingEnforcement,integratedServices,aiPlatformFloorSetting,floorSettingMetadata" \
           -d '{
             "enableFloorSettingEnforcement": true,
             "integratedServices": ["AI_PLATFORM"],
             "aiPlatformFloorSetting": {
               "inspectAndBlock": true,
               "enableCloudLogging": true
+            },
+            "floorSettingMetadata": {
+              "multiLanguageDetection": {
+                "enableMultiLanguageDetection": true
+              }
             },
             "filterConfig": {
               "raiSettings": {
@@ -79,6 +84,11 @@ resource "terraform_data" "model_armor_template" {
           -H "Content-Type: application/json" \
           "https://modelarmor.${var.location}.rep.googleapis.com/v1/projects/${var.project_id}/locations/${var.location}/templates?templateId=${var.template_id}" \
           -d '{
+            "templateMetadata": {
+              "multiLanguageDetection": {
+                "enableMultiLanguageDetection": true
+              }
+            },
             "filterConfig": {
               "raiSettings": {
                 "raiFilters": [

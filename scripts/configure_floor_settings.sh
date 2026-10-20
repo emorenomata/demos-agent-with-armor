@@ -49,6 +49,11 @@ RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X PATCH \
     \"aiPlatformFloorSetting\": {
       ${AI_PLATFORM_SETTING}
     },
+    \"floorSettingMetadata\": {
+      \"multiLanguageDetection\": {
+        \"enableMultiLanguageDetection\": true
+      }
+    },
     \"filterConfig\": {
       \"raiSettings\": {
         \"raiFilters\": [

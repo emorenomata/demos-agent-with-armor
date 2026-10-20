@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🛡️ Armor Agent — Plataforma Vertex AI + Model Armor (Material Design 3)</title>
-  <!-- Cache-Busting Versioning v=20261019-v4 -->
-  <link rel="stylesheet" href="/static/styles.css?v=20261019-v4">
+  <!-- Cache-Busting Versioning v=20261020-v6 -->
+  <link rel="stylesheet" href="/static/styles.css?v=20261020-v6">
 </head>
 <body class="h-full flex flex-col font-sans overflow-hidden bg-[var(--md-sys-color-background)] text-[var(--md-sys-color-on-background)]">
 
@@ -59,12 +59,17 @@
         </label>
         <select id="presetSelect" class="md3-select-compact text-xs bg-slate-800 text-slate-100 rounded-lg border-0 focus:ring-1 focus:ring-amber-400 py-1 pl-2 pr-6" onchange="if(this.value!=='') { applyPreset(Number(this.value)); this.value=''; }">
           <option value="" selected disabled>Cargar prueba de seguridad...</option>
-          <optgroup label="🚫 Ataques en Prompt de Entrada (SANITIZE_USER_PROMPT)">
+          <optgroup label="🚫 Ataques en Prompt de Entrada (Español · SANITIZE_USER_PROMPT)">
             <option value="0">🚫 Entrada: Inyección de Prompt / Jailbreak</option>
             <option value="1">💳 Entrada: Fuga de Tarjeta (SDP)</option>
             <option value="2">🔑 Entrada: Secreto / Contraseña (SDP)</option>
             <option value="3">⚠️ Entrada: Solicitud Peligrosa (RAI)</option>
             <option value="4">🔗 Entrada: Enlace Malicioso / Phishing (Web Risk)</option>
+          </optgroup>
+          <optgroup label="🌐 Ataques Multilenguaje (EN · 中文 · العربية — Multi-Language Detection)">
+            <option value="9">🇺🇸 Multilenguaje (EN): Inyección de Prompt / DAN (Inglés)</option>
+            <option value="10">🇨🇳 Multilenguaje (ZH): Jailbreak + Explosivos (Chino Mandarín · 中文)</option>
+            <option value="11">🇸🇦 Multilenguaje (AR): Jailbreak + Explosivos/Ciberataque (Árabe · العربية)</option>
           </optgroup>
           <optgroup label="📤 Fugas en Respuesta del Modelo (SANITIZE_MODEL_RESPONSE)">
             <option value="5">📤 Respuesta: Tarjeta de Juan Pérez (CRM → Salida SDP)</option>
@@ -226,6 +231,15 @@
         </span>
         <button type="button" onclick="applyPreset(0)" class="md3-assist-chip" title="Bloqueo en Prompt de Entrada (SANITIZE_USER_PROMPT)">
           🚫 Entrada: Jailbreak
+        </button>
+        <button type="button" onclick="applyPreset(9)" class="md3-assist-chip" title="Ataque Multilenguaje en Inglés — Multi-Language Detection (EN)">
+          🇺🇸 Inglés: DAN Jailbreak
+        </button>
+        <button type="button" onclick="applyPreset(10)" class="md3-assist-chip" title="Ataque Multilenguaje en Chino Mandarín — Multi-Language Detection (ZH · 中文)">
+          🇨🇳 Chino (中文): Jailbreak + Bomba
+        </button>
+        <button type="button" onclick="applyPreset(11)" class="md3-assist-chip" title="Ataque Multilenguaje en Árabe — Multi-Language Detection (AR · العربية)">
+          🇸🇦 Árabe (العربية): Jailbreak + Ataque
         </button>
         <button type="button" onclick="applyPreset(1)" class="md3-assist-chip" title="Bloqueo en Prompt de Entrada (SANITIZE_USER_PROMPT)">
           💳 Entrada: Tarjeta (SDP)
@@ -824,7 +838,7 @@
 
   </main>
 
-  <!-- Lógica Frontend con Cache-Busting Versioning v=20261019-v4 -->
-  <script src="/static/app.js?v=20261019-v4"></script>
+  <!-- Lógica Frontend con Cache-Busting Versioning v=20261020-v6 -->
+  <script src="/static/app.js?v=20261020-v6"></script>
 </body>
 </html>

@@ -226,7 +226,11 @@ function renderPresetsDropdown() {
 
   const inputAttackGroup = state.presets
     .map((p, idx) => ({ ...p, idx }))
-    .filter(p => p.stage === 'input' || (!p.stage && !p.title.includes('Legítima') && !p.title.includes('Respuesta:')));
+    .filter(p => p.stage === 'input' || (!p.stage && !p.title.includes('Legítima') && !p.title.includes('Respuesta:') && !p.title.includes('Multilenguaje')));
+
+  const multiLangGroup = state.presets
+    .map((p, idx) => ({ ...p, idx }))
+    .filter(p => p.stage === 'multilang' || p.title.includes('Multilenguaje'));
 
   const outputLeakGroup = state.presets
     .map((p, idx) => ({ ...p, idx }))
@@ -238,8 +242,11 @@ function renderPresetsDropdown() {
 
   selectEl.innerHTML = `
     <option value="" selected disabled>⚡ Cargar prueba de seguridad...</option>
-    <optgroup label="🚫 Ataques en Prompt de Entrada (SANITIZE_USER_PROMPT)">
+    <optgroup label="🚫 Ataques en Prompt de Entrada (Español · SANITIZE_USER_PROMPT)">
       ${inputAttackGroup.map(p => `<option value="${p.idx}">${escapeHtml(p.title)}</option>`).join('')}
+    </optgroup>
+    <optgroup label="🌐 Ataques Multilenguaje (EN · 中文 · العربية — Multi-Language Detection)">
+      ${multiLangGroup.map(p => `<option value="${p.idx}">${escapeHtml(p.title)}</option>`).join('')}
     </optgroup>
     <optgroup label="📤 Fugas en Respuesta del Modelo (SANITIZE_MODEL_RESPONSE)">
       ${outputLeakGroup.map(p => `<option value="${p.idx}">${escapeHtml(p.title)}</option>`).join('')}
@@ -260,9 +267,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   initPresetsDropdown();
   setupEventListeners();
 
+  // /api/templates ya incluye policies, evitando doble llamada HTTP redundante al iniciar
   await Promise.all([
     loadTemplatesAndPresets(),
-    loadPoliciesSummary(),
     loadCloudLogs()
   ]);
 });
@@ -274,9 +281,11 @@ async function loadTemplatesAndPresets() {
       const data = await res.json();
       state.presets = data.attack_presets || [];
       renderPresetsDropdown();
-      if (data.policies && !state.policiesData) {
+      if (data.policies) {
         state.policiesData = data.policies;
         renderPoliciesBreakdown();
+      } else {
+        await loadPoliciesSummary();
       }
     }
   } catch (err) {
@@ -323,6 +332,9 @@ function recordTriggeredMatches(matchedFilters) {
       state.triggeredRuleIds.add('maliciousUriFilterSettings');
       state.triggeredDetectors.add('MALICIOUS_URI');
     }
+    if (name.includes('MULTILANGUAGE') || detected.includes('MULTI_LANGUAGE')) {
+      state.triggeredRuleIds.add('multiLanguageDetection');
+    }
   }
   renderPoliciesBreakdown();
 }
@@ -360,6 +372,10 @@ function renderPoliciesBreakdown() {
   const rawFloorJson = JSON.stringify(p.raw_floor_setting || {}, null, 2);
 
   const ruleStyleMap = {
+    multiLanguageDetection: {
+      badge: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+      iconClass: 'fa-language text-emerald-400'
+    },
     piAndJailbreakFilterSettings: {
       badge: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
       iconClass: 'fa-user-secret text-rose-400'
@@ -924,7 +940,7 @@ async function sendMessage() {
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 45000);
+    const timeoutId = setTimeout(() => controller.abort(), 90000);
 
     const res = await fetch('/api/chat', {
       method: 'POST',
